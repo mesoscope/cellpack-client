@@ -21,4 +21,11 @@ export const FIRESTORE_FIELDS = {
     NAME: "name",
     BATCH_JOB_ID: "batch_job_id",
     ORIGINAL_LOCATION: "original_location",
+    RECIPE_PATH: "recipe_path",
+    INHERIT: "inherit",
+    COMPOSITION: "composition",
+    OBJECT: "object",
+    REGIONS: "regions",
+    INTERIOR: "interior",
+    GRADIENT: "gradient",
 } as const;
