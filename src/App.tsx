@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { queryFirebase, getLocationDict, getDocById } from "./firebase";
+import { queryFirebase, getLocationDict, getDocById, getFirebaseRecipe } from "./firebase";
 import {
     getSubmitPackingUrl,
     packingStatusUrl,
@@ -31,12 +31,13 @@ function App() {
     const [resultUrl, setResultUrl] = useState<string>("");
     const [recipeStr, setRecipeStr] = useState<string>("");
     const [configStr, setConfigStr] = useState<string>("");
-    const [viewRecipe, setViewRecipe] = useState<Boolean>(true);
-    const [viewConfig, setViewConfig] = useState<Boolean>(true);
-    const [viewLogs, setViewLogs] = useState<Boolean>(true);
+    const [viewRecipe, setViewRecipe] = useState<boolean>(true);
+    const [viewConfig, setViewConfig] = useState<boolean>(true);
+    const [viewLogs, setViewLogs] = useState<boolean>(true);
 
     const submitRecipe = async () => {
-        const url = getSubmitPackingUrl(selectedRecipe, selectedConfig);
+        const firebaseRecipe = "firebase:recipes/" + selectedRecipe
+        const url = getSubmitPackingUrl(firebaseRecipe, selectedConfig);
         const request: RequestInfo = new Request(url, {
             method: "POST",
         });
@@ -47,7 +48,7 @@ function App() {
     };
 
     const getRecipes = async () => {
-        const recipeDict = await getLocationDict(FIRESTORE_COLLECTIONS.EXAMPLE_RECIPES);
+        const recipeDict = await getLocationDict(FIRESTORE_COLLECTIONS.RECIPES);
         return recipeDict;
     };
 
@@ -121,15 +122,7 @@ function App() {
 
     const selectRecipe = async (recipe: string) => {
         setSelectedRecipe(recipe);
-        // Determine the firebaseId for this recipe
-        let firebaseId = "unknown"
-        for (let name in recipes) {
-            let path = recipes[name]["path"];
-            if (path == recipe) {
-                firebaseId = recipes[name]["firebaseId"]
-            }
-        }
-        const recStr = await getDocById(FIRESTORE_COLLECTIONS.EXAMPLE_RECIPES, firebaseId);
+        const recStr = await getFirebaseRecipe(recipe);
         setRecipeStr(recStr);
     }
 
@@ -137,14 +130,13 @@ function App() {
         setSelectedConfig(config);
         // Determine the firebaseId for this config
         let firebaseId = "unknown"
-        for (let name in configs) {
-            let path = configs[name]["path"];
+        for (const name in configs) {
+            const path = configs[name]["path"];
             if (path == config) {
                 firebaseId = configs[name]["firebaseId"]
             }
         }
         const confStr = await getDocById(FIRESTORE_COLLECTIONS.CONFIGS, firebaseId);
-        console.log(confStr);
         setConfigStr(confStr);
     }
 
@@ -179,7 +171,7 @@ function App() {
                         Select a recipe
                     </option>
                     {Object.entries(recipes).map(([key, value]) => (
-                        <option key={key} value={value["path"]}>
+                        <option key={key} value={value["firebaseId"]}>
                             {key}
                         </option>
                     ))}
