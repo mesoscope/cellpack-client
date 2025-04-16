@@ -47,19 +47,18 @@
   float: left;
 }
 
-.recipeJSON {
-  max-height: 300px;
-  width: 450px;
-  overflow-y: auto;
-}
-
 .configBox {
   width: 45%;
   float: right;
 }
 
-.configJSON {
-  max-height: 300px;
+textarea {
   width: 450px;
-  overflow-y: auto;
+  height: 300px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  resize: none;
 }

@@ -6,6 +6,7 @@ import {
     getDocs,
     where,
     documentId,
+    addDoc,
 } from "firebase/firestore";
 import {
     FIREBASE_CONFIG,
@@ -83,9 +84,15 @@ const getLocationDict = async (collectionName: string) => {
 }
 
 const getDocById = async (coll: string, id: string) => {
-    const docs = await getAllDocsFromCollection(coll);
-    const doc = docs.find(d => d.id === id);
-    return JSON.stringify(doc, null, 2);
+    const q = query(
+        collection(db, coll),
+        where(documentId(), "==", id)
+    );
+    const querySnapshot = await getDocs(q);
+    const doc = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+    }));
+    return doc[0];
 }
 
 const getRecipeDoc = async (id: string): Promise<FirebaseRecipe> => {
@@ -230,4 +237,13 @@ const getFirebaseRecipe = async (name: string): Promise<string> => {
     return unpackedRecipe;
 }
 
-export { db, queryFirebase, getLocationDict, getDocById, getFirebaseRecipe };
+const updateConfig = async (data) => {
+    try {
+        const docRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.CONFIGS), data);
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    }
+}
+
+export { db, queryFirebase, getLocationDict, getDocById, getFirebaseRecipe, updateConfig };
