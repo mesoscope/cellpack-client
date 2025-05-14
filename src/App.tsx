@@ -33,19 +33,41 @@ function App() {
     const [configStr, setConfigStr] = useState<string>("");
     const [viewRecipe, setViewRecipe] = useState<boolean>(true);
     const [viewConfig, setViewConfig] = useState<boolean>(true);
+    const [viewResults, setViewResults] = useState<boolean>(false);
     const [viewLogs, setViewLogs] = useState<boolean>(true);
+    const [runTime, setRunTime] = useState<number>(0);
 
-    const submitRecipe = async () => {
+    let start = 0;
+
+    async function sleep(ms: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    };
+
+    const submitRecipe = async (useECS: boolean = false) => {
+        setResultUrl("");
         const firebaseRecipe = "firebase:recipes/" + selectedRecipe
         const firebaseConfig = "firebase:configs/" + selectedConfig;
-        const url = getSubmitPackingUrl(firebaseRecipe, firebaseConfig);
+        const url = getSubmitPackingUrl(firebaseRecipe, firebaseConfig, useECS);
         const request: RequestInfo = new Request(url, {
-            method: "POST",
+            method: useECS ? "GET" : "POST",
         });
+        start = Date.now();
         const response = await fetch(request);
         const data = await response.json();
-        setJobId(data.jobId);
-        return data.jobId;
+        if (useECS) {
+            if (response.ok) {
+                const range = (Date.now() - start) / 1000;
+                setRunTime(range);
+                setJobId(data.job_id);
+                setJobStatus(JobStatus.SUCCEEDED);
+                return data.job_id;
+            } else {
+                setJobStatus(JobStatus.FAILED);
+            }
+        } else {
+            setJobId(data.jobId);
+            return data.jobId;
+        }
     };
 
     const getRecipes = async () => {
@@ -93,7 +115,10 @@ function App() {
                 setJobStatus(data.jobs[0].status);
             }
             setLogStreamName(data.jobs[0].container.logStreamName);
+            await sleep(500);
         }
+        const range = (Date.now() - start) / 1000;
+        setRunTime(range);
     };
 
     const fetchResultUrl = async () => {
@@ -121,6 +146,13 @@ function App() {
         setViewRecipe(false);
     };
 
+    const runPackingECS = async () => {
+        submitRecipe(true);
+        setJobStatus(JobStatus.SUBMITTED);
+        setViewConfig(false);
+        setViewRecipe(false);
+    };
+
     const selectRecipe = async (recipe: string) => {
         setSelectedRecipe(recipe);
         const recStr = await getFirebaseRecipe(recipe);
@@ -141,6 +173,13 @@ function App() {
         setViewConfig(!viewConfig);
     }
 
+    const toggleResults = () => {
+        if (resultUrl == "") {
+            fetchResultUrl();
+        }
+        setViewResults(!viewResults);
+    }
+
     const toggleLogs = async () => {
         if (jobLogs.length == 0) {
             await getLogs();
@@ -151,6 +190,7 @@ function App() {
 
     const jobSucceeded = jobStatus == JobStatus.SUCCEEDED;
     const showLogButton = jobSucceeded || jobStatus == JobStatus.FAILED;
+    const showResults = resultUrl && viewResults;
 
     return (
         <div className="app">
@@ -183,7 +223,10 @@ function App() {
                     ))}
                 </select>
                 <button onClick={runPacking} disabled={!selectedRecipe}>
-                    Pack
+                    Pack on Batch
+                </button>
+                <button onClick={runPackingECS} disabled={!selectedRecipe}>
+                    Pack on ECS
                 </button>
             </div>
             <div className="box">
@@ -211,11 +254,12 @@ function App() {
             <h3>Job Status: {jobStatus}</h3>
             {jobSucceeded && (
                 <div>
-                    <button onClick={fetchResultUrl}>View result</button>
+                    <h4>Time to Run: {runTime} sec</h4>
+                    <button onClick={toggleResults}>Results</button>
                 </div>
             )}
             {
-                resultUrl && (
+                showResults && (
                     <div>
                         <iframe
                             src={resultUrl}
