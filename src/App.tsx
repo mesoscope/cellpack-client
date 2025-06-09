@@ -222,9 +222,6 @@ function App() {
                         </option>
                     ))}
                 </select>
-                <button onClick={runPacking} disabled={!selectedRecipe}>
-                    Pack on Batch
-                </button>
                 <button onClick={runPackingECS} disabled={!selectedRecipe}>
                     Pack on ECS
                 </button>

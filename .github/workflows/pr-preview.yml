@@ -29,9 +29,6 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.number }}
 
-      - name: debug
-        run: echo "PR number - ${{ github.event.number }}"
-
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
