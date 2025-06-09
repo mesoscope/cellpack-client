@@ -25,10 +25,9 @@ jobs:
         run: bun install
 
       - name: Build with Vite
-        run: bun run build
+        run: bun run build --base=/cellpack-client
 
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./dist/
-          preview-branch: gh-pages
