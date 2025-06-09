@@ -25,7 +25,10 @@ jobs:
         run: bun install
 
       - name: Build with Vite
-        run: bun run build --base=/cellpack-client
+        run: bun run build --base=/cellpack-client/pr-preview/pr-${PR_NUMBER}
+        run: echo "PR number - ${{ github.event.number }}"
+        env:
+          PR_NUMBER: ${{ github.event.number }}
 
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
