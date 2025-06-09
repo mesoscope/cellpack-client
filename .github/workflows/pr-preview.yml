@@ -30,6 +30,7 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
 
       - name: Deploy preview
-        uses: rossjrw/pr-preview-action@430e3dfc1de8a8ae77e77d862d25676ef9db55d1
+        uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./dist/
+          preview-branch: gh-pages
