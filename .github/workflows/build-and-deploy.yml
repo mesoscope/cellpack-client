@@ -5,7 +5,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['main', 'feature/pr-preview-link']
+    branches: ['main', 'feature/pr-preview-linkg']
 
 permissions:
   contents: write
@@ -31,17 +31,23 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          name: production-files
           path: ./dist
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: 
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
         with:
+          name: production-files
+          path: ./dist
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: ./dist
           clean-exclude: pr-preview/
+          branch: gh-pages
