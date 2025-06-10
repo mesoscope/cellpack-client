@@ -127,6 +127,9 @@ function App() {
     };
 
     const getLogs = async () => {
+        if (logStreamName === "") {
+            await runPacking();
+        }
         const url = getLogsUrl(logStreamName);
         const request: RequestInfo = new Request(
             url,
