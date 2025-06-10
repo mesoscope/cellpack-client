@@ -127,9 +127,6 @@ function App() {
     };
 
     const getLogs = async () => {
-        if (logStreamName === "") {
-            await runPacking();
-        }
         const url = getLogsUrl(logStreamName);
         const request: RequestInfo = new Request(
             url,
@@ -225,6 +222,9 @@ function App() {
                         </option>
                     ))}
                 </select>
+                <button onClick={runPacking} disabled={!selectedRecipe}>
+                    Pack on Batch
+                </button>
                 <button onClick={runPackingECS} disabled={!selectedRecipe}>
                     Pack on ECS
                 </button>
