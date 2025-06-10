@@ -27,19 +27,10 @@ jobs:
 
       - name: Build with Vite
         run: bun run build --base=/cellpack-client
-      
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: 
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: ./dist
+          clean-exclude: pr-preview/
+          branch: gh-pages
