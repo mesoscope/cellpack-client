@@ -14,6 +14,8 @@ import { SIMULARIUM_EMBED_URL } from "./constants/urls";
 import {
     FirebaseDict,
 } from "./types";
+import { Link } from "react-router-dom";
+import { PageRoutes } from "./constants/routes";
 
 function App() {
     const [recipes, setRecipes] = useState<FirebaseDict>({});
@@ -280,6 +282,13 @@ function App() {
                     )}
                 </div>
             )}
+            <div>
+                <Link 
+                    to={PageRoutes.LANDING_PAGE}
+                >
+                    ← Back to Home
+                </Link>
+            </div>
         </div>
     );
 }
