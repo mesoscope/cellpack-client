@@ -1,0 +1,14 @@
+.logBox {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  text-align: start;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-size: 14px;
+  align-items: flex-start;
+  border: 1px solid #ddd;
+}
