@@ -297,7 +297,7 @@ const updateRecipe = async (id: string, data: object) => {
     await setDoc(doc(db, FIRESTORE_COLLECTIONS.EDITED_RECIPES, id), data);
 }
 
-const cleanupOldDocuments = async () => {
+const docCleanup = async () => {
     const now = Date.now();
     const collectionsToClean = [
         { name: FIRESTORE_COLLECTIONS.EDITED_RECIPES, retention: RETENTION_POLICY.RETENTION_PERIODS.RECIPES_EDITED },
@@ -323,4 +323,4 @@ const cleanupOldDocuments = async () => {
         console.log(`Cleaned up ${deletePromises.length} documents from ${collectionConfig.name}`);
     }
 }
-export { db, getLocationDict, getDocById, getFirebaseRecipe, getJobStatus, getResultPath, updateRecipe, cleanupOldDocuments, queryDocumentsByTime };
+export { db, getLocationDict, getDocById, getFirebaseRecipe, getJobStatus, getResultPath, updateRecipe, docCleanup };
