@@ -28,4 +28,4 @@ jobs:
           MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
           APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
-        run: bun run scripts/cleanup.ts 
+        run: bun run scripts/cleanup.ts
