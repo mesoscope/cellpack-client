@@ -18,7 +18,7 @@ import {
     FIRESTORE_COLLECTIONS,
     FIRESTORE_FIELDS,
     RETENTION_POLICY,
-} from "./constants/firebaseConstants";
+} from "../constants/firebase";
 import {
     Dictionary,
     FirebaseComposition,
@@ -30,7 +30,7 @@ import {
     RefsByCollection,
     RegionObject,
     ViewableRecipe,
-} from "./types";
+} from "../types";
 import { resolveRefs, isFirebaseRef, isInRefsByCollection, addRef } from "./recipeLoader";
 
 const getEnvVar = (key: string): string => {

@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import "./App.css";
-import { getResultPath, getDocById, getFirebaseRecipe, getJobStatus, updateRecipe } from "./firebase";
+import { getResultPath, getDocById, getFirebaseRecipe, getJobStatus, updateRecipe } from "./utils/firebase";
 import {
     getSubmitPackingUrl,
-    JobStatus,
-} from "./constants/awsBatch";
+    JOB_STATUS,
+} from "./constants/aws";
 import {
     FIRESTORE_COLLECTIONS,
     FIRESTORE_FIELDS,
-} from "./constants/firebaseConstants";
+} from "./constants/firebase";
 import { SIMULARIUM_EMBED_URL } from "./constants/urls";
 import { Link } from "react-router-dom";
 import { PageRoutes } from "./constants/routes";
@@ -60,7 +60,7 @@ function App() {
             try {
                 await updateRecipe(recipeId, recipeJson);
             } catch(e) {
-                setJobStatus(JobStatus.FAILED);
+                setJobStatus(JOB_STATUS.FAILED);
                 setJobLogs(String(e));
                 return;
             }
@@ -70,14 +70,14 @@ function App() {
         const request: RequestInfo = new Request(url, { method: "POST" });
         start = Date.now();
         const response = await fetch(request);
-        setJobStatus(JobStatus.SUBMITTED);
+        setJobStatus(JOB_STATUS.SUBMITTED);
         const data = await response.json();
         if (response.ok) {
             setJobId(data.jobId);
-            setJobStatus(JobStatus.STARTING);
+            setJobStatus(JOB_STATUS.STARTING);
             return data.jobId;
         } else {
-            setJobStatus(JobStatus.FAILED);
+            setJobStatus(JOB_STATUS.FAILED);
             setJobLogs(JSON.stringify(data));
         }
     };
@@ -89,7 +89,7 @@ function App() {
     const checkStatus = async (jobIdFromSubmit: string) => {
         const id = jobIdFromSubmit || jobId;
         let localJobStatus = await getJobStatus(id);
-        while (localJobStatus !== JobStatus.DONE && localJobStatus !== JobStatus.FAILED) {
+        while (localJobStatus !== JOB_STATUS.DONE && localJobStatus !== JOB_STATUS.FAILED) {
             await sleep(500);
             const newJobStatus = await getJobStatus(id);
             if (localJobStatus !== newJobStatus) {
@@ -99,9 +99,9 @@ function App() {
         }
         const range = (Date.now() - start) / 1000;
         setRunTime(range);
-        if (localJobStatus == JobStatus.DONE) {
+        if (localJobStatus == JOB_STATUS.DONE) {
             fetchResultUrl(id);
-        } else if (localJobStatus == JobStatus.FAILED) {
+        } else if (localJobStatus == JOB_STATUS.FAILED) {
             getLogs(id);
         }
     };
@@ -125,8 +125,8 @@ function App() {
         setViewResults(!viewResults);
     }
 
-    const jobSucceeded = jobStatus == JobStatus.DONE;
-    const showLogButton = jobStatus == JobStatus.FAILED;
+    const jobSucceeded = jobStatus == JOB_STATUS.DONE;
+    const showLogButton = jobStatus == JOB_STATUS.FAILED;
     const showResults = resultUrl && viewResults;
 
     return (

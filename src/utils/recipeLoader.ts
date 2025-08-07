@@ -1,4 +1,4 @@
-import { FIRESTORE_COLLECTIONS } from "./constants/firebaseConstants";
+import { FIRESTORE_COLLECTIONS } from "../constants/firebase";
 import {
     Dictionary,
     FirebaseComposition,
@@ -8,7 +8,7 @@ import {
     RegionObject,
     RefsByCollection,
     ViewableRecipe,
-} from "./types";
+} from "../types";
 
 const isFirebaseRef = (x: string | null | undefined) => {
     return x !== null && x !== undefined && typeof x == "string" && x.startsWith("firebase");
