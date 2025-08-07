@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { FirebaseDict } from "../../types";
 import { FIRESTORE_COLLECTIONS } from "../../constants/firebaseConstants";
 import { getFirebaseRecipe, getDocById, getLocationDict } from "../../firebase";
+import Dropdown from "../Dropdown";
+import JSONViewer from "../JSONViewer";
 import "./style.css";
 
 interface PackingInputProps {
@@ -58,57 +60,38 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
     return (
         <div>
             <div className="input-container">
-                <select
+                <Dropdown
                     value={selectedRecipeId}
-                    onChange={(e) => selectRecipe(e.target.value)}
-                >
-                    <option value="" disabled>
-                        Select a recipe
-                    </option>
-                    {Object.entries(recipes).map(([key, value]) => (
-                        <option key={key} value={value["firebaseId"]}>
-                            {key}
-                        </option>
-                    ))}
-                </select>
-                <select
+                    placeholder="Select a recipe"
+                    options={recipes}
+                    onChange={selectRecipe}
+                />
+                <Dropdown
                     value={selectedConfigId}
-                    onChange={(e) => selectConfig(e.target.value)}
-                >
-                    <option value="" disabled>
-                        Select a config
-                    </option>
-                    {Object.entries(configs).map(([key, value]) => (
-                        <option key={key} value={value["firebaseId"]}>
-                            {key}
-                        </option>
-                    ))}
-                </select>
+                    placeholder="Select a config"
+                    options={configs}
+                    onChange={selectConfig}
+                />
                 <button onClick={runPacking} disabled={!selectedRecipeId}>
                     Pack
                 </button>
             </div>
             <div className="box">
-                {recipeStr.length > 0 && (
-                    <div className="recipe-box">
-                        <button type="button" className="collapsible" onClick={toggleRecipe}>Recipe</button>
-                        <div className="recipe-json">
-                            {viewRecipe && (
-                                <textarea value={recipeStr} onChange={e => setRecipeStr(e.target.value)}/>
-                            )}
-                        </div>
-                    </div>
-                )}
-                {configStr.length > 0 && (
-                    <div className="config-box">
-                        <button type="button" className="collapsible" onClick={toggleConfig}>Config</button>
-                        <div className="config-json">
-                            {viewConfig && (
-                                <pre>{configStr}</pre>
-                            )}
-                        </div>
-                    </div>
-                )}
+                <JSONViewer
+                    title="Recipe"
+                    content={recipeStr}
+                    isVisible={viewRecipe}
+                    isEditable={true}
+                    onToggle={toggleRecipe}
+                    onChange={setRecipeStr}
+                />
+                <JSONViewer
+                    title="Config"
+                    content={configStr}
+                    isVisible={viewConfig}
+                    isEditable={false}
+                    onToggle={toggleConfig}
+                />
             </div>
         </div>
     );
