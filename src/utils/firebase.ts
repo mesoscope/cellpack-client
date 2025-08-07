@@ -20,18 +20,9 @@ import {
     RETENTION_POLICY,
 } from "../constants/firebase";
 import {
-    Dictionary,
-    FirebaseComposition,
     FirebaseDict,
     FirestoreDoc,
-    FirebaseGradient,
-    FirebaseObject,
-    FirebaseRecipe,
-    RefsByCollection,
-    RegionObject,
-    ViewableRecipe,
 } from "../types";
-import { resolveRefs, isFirebaseRef, isInRefsByCollection, addRef } from "./recipeLoader";
 
 const getEnvVar = (key: string): string => {
     // check if we're in a browser environment (Vite)
@@ -152,20 +143,6 @@ const getDocById = async (coll: string, id: string) => {
     return JSON.stringify(doc, null, 2);
 }
 
-const getRecipeDoc = async (id: string): Promise<FirebaseRecipe> => {
-    const querySnapshot = await queryDocumentById(FIRESTORE_COLLECTIONS.RECIPES, id);
-    const docs: Array<FirebaseRecipe> = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-        dedup_hash: doc.data().dedup_hash,
-        ...doc.data(),
-    }));
-    if (docs.length === 0) {
-        throw new Error(`Recipe with ID ${id} not found`);
-    }
-    return docs[0];
-};
-
 const getDocsByIds = async (coll: string, ids: string[]) => {
     const querySnapshot = await queryDocumentsByIds(coll, ids);
     const docs = querySnapshot.docs.map((doc) => ({
@@ -177,123 +154,7 @@ const getDocsByIds = async (coll: string, ids: string[]) => {
     return docs;
 }
 
-const searchForRefs = async (
-    refs: string[],
-    refsToObj: RefsByCollection
-): Promise<RefsByCollection> => {
-    // split up the refs we're searching for by collection, so we can
-    // handle searching with one query per collection
-    const refsToGetByCollection: Dictionary<Array<string>> = {};
-    refs.forEach((ref) => {
-        const splitRef: string[] = ref.split((/:|\//));
-        const collectionName = splitRef[1];
-        // Only need to search if we don't already have the object for this reference
-        if (!isInRefsByCollection(ref, collectionName, refsToObj)) {
-            // firebase:collection/doc -> [firebase, collection, doc]
-            if (!(collectionName in refsToGetByCollection)) {
-                refsToGetByCollection[collectionName] = [];
-            }
-            if (!(splitRef[2] in refsToGetByCollection[collectionName])) {
-                // Only need to search for each ref once
-                refsToGetByCollection[collectionName].push(splitRef[2]);
-            }
-        }
-    });
-
-    for (const coll in refsToGetByCollection) {
-        const results: FirebaseRecipe[] | FirebaseComposition[] | FirebaseObject[] | FirebaseGradient[] = await getDocsByIds(coll, refsToGetByCollection[coll]);
-        results.forEach((result) => {
-            const refName = "firebase:" + coll + "/" + result.id;
-            refsToObj = addRef(refName, coll, result, refsToObj);
-        });
-    }
-    return refsToObj
-}
-
-const unpackReferences = async (doc: FirebaseRecipe): Promise<string> => {
-    // Step through the recipe, and search Firebase for the referenced paths
-
-    // First, walk through the recipe's compositions, and resolve their references
-    let refsToGet: string[] = [];
-    if (doc.composition) {
-        const compositions: Dictionary<FirebaseComposition> = doc.composition;
-        for (const ref of Object.values(compositions)) {
-            if (isFirebaseRef(ref.inherit) && typeof ref.inherit == 'string') {
-                refsToGet.push(ref.inherit);
-            }
-        }
-    }
-    let refsDict: RefsByCollection = {recipes: {}, composition: {}, gradients: {}, objects: {}};
-    refsDict = await searchForRefs(refsToGet, refsDict);
-
-    // Second, step through the resolved compositions from above and resolve references to other
-    // compositions or objects referenced there
-    refsToGet = [];
-    for (const ref in refsDict.composition) {
-        for (const [field, fieldValue] of Object.entries(refsDict.composition[ref])) {
-            if (field === FIRESTORE_FIELDS.OBJECT) {
-                if (isFirebaseRef(fieldValue)) {
-                    refsToGet.push(fieldValue);
-                }
-            } else if (field === FIRESTORE_FIELDS.REGIONS) {
-                for (const region_type in fieldValue) {
-                    const region_data: Array<string|RegionObject> = fieldValue[region_type];
-                    if (region_data) {
-                        region_data.forEach((obj) => {
-                            if (typeof obj === "string" && isFirebaseRef(obj)) {
-                                refsToGet.push(obj);
-                            }
-                            else if (obj instanceof Object && isFirebaseRef(obj[FIRESTORE_FIELDS.OBJECT])) {
-                                refsToGet.push(obj[FIRESTORE_FIELDS.OBJECT]);
-                            }
-                        });
-                    }
-                }
-            }
-        }
-    }
-    refsDict = await searchForRefs(refsToGet, refsDict);
-
-    // Third, go through references in compositions or objects received above. References may be to gradients or objects
-    refsToGet = [];
-    for (const ref in refsDict.composition) {
-        for (const [field, fieldValue] of Object.entries(refsDict.composition[ref])) {
-            if (
-                field === FIRESTORE_FIELDS.OBJECT
-                || field === FIRESTORE_FIELDS.INHERIT
-            ) {
-                if (isFirebaseRef(fieldValue) && !(fieldValue in refsDict.composition)) {
-                    refsToGet.push(fieldValue);
-                }
-            }
-        }
-    }
-    for (const ref in refsDict.objects) {
-        for (const [field, fieldValue] of Object.entries(refsDict.objects[ref])) {
-            if (
-                field === FIRESTORE_FIELDS.GRADIENT
-                || field === FIRESTORE_FIELDS.INHERIT
-            ) {
-                if (isFirebaseRef(fieldValue) && !(fieldValue in refsDict.objects)) {
-                    refsToGet.push(fieldValue);
-                }
-            }
-        }
-    }
-    refsDict = await searchForRefs(refsToGet, refsDict);
-
-    // Resolve references in doc using refsDict
-    const resolvedDoc: ViewableRecipe = resolveRefs(doc, refsDict);
-    return JSON.stringify(resolvedDoc, null, 2);
-}
-
-const getFirebaseRecipe = async (name: string): Promise<string> => {
-    const recipe: FirebaseRecipe = await getRecipeDoc(name);
-    const unpackedRecipe: string = await unpackReferences(recipe);
-    return unpackedRecipe;
-}
-
-const updateRecipe = async (id: string, data: object) => {
+const addRecipe = async (id: string, data: object) => {
     await setDoc(doc(db, FIRESTORE_COLLECTIONS.EDITED_RECIPES, id), data);
 }
 
@@ -323,4 +184,4 @@ const docCleanup = async () => {
         console.log(`Cleaned up ${deletePromises.length} documents from ${collectionConfig.name}`);
     }
 }
-export { db, getLocationDict, getDocById, getFirebaseRecipe, getJobStatus, getResultPath, updateRecipe, docCleanup };
+export { db, queryDocumentById, getLocationDict, getDocById, getDocsByIds, getJobStatus, getResultPath, addRecipe, docCleanup };

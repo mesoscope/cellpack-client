@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import "./App.css";
-import { getResultPath, getDocById, getFirebaseRecipe, getJobStatus, updateRecipe } from "./utils/firebase";
+import { getResultPath, getDocById, getJobStatus, addRecipe } from "./utils/firebase";
+import { getFirebaseRecipe } from "./utils/recipeLoader";
 import {
     getSubmitPackingUrl,
     JOB_STATUS,
@@ -58,7 +59,7 @@ function App() {
             firebaseRecipe = "firebase:recipes_edited/" + recipeId;
             const recipeJson = recipeToFirebase(recipeString, firebaseRecipe, recipeId);
             try {
-                await updateRecipe(recipeId, recipeJson);
+                await addRecipe(recipeId, recipeJson);
             } catch(e) {
                 setJobStatus(JOB_STATUS.FAILED);
                 setJobLogs(String(e));
