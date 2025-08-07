@@ -10,13 +10,13 @@ export const getSubmitPackingUrl = (
         url += `&config=${config}`;
     }
     return url;
-}
+};
 
 //job status
-export enum JobStatus {
-    SUBMITTED = "SUBMITTED",
-    STARTING = "STARTING",
-    RUNNING = "RUNNING",
-    DONE = "DONE",
-    FAILED = "FAILED",
-}
+export const JOB_STATUS = {
+    SUBMITTED: "SUBMITTED",
+    STARTING: "STARTING",
+    RUNNING: "RUNNING",
+    DONE: "DONE",
+    FAILED: "FAILED",
+};

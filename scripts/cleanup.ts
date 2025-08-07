@@ -1,5 +1,5 @@
 
-import { docCleanup } from '../src/firebase.ts';
+import { docCleanup } from '../src/utils/firebase.ts';
 
 async function main() {
     try {

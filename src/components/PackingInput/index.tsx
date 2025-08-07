@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { FirebaseDict } from "../../types";
-import { FIRESTORE_COLLECTIONS } from "../../constants/firebaseConstants";
-import { getFirebaseRecipe, getDocById, getLocationDict } from "../../firebase";
+import { FIRESTORE_COLLECTIONS } from "../../constants/firebase";
+import { getDocById, getLocationDict } from "../../utils/firebase";
+import { getFirebaseRecipe } from "../../utils/recipeLoader";
 import "./style.css";
 
 interface PackingInputProps {
