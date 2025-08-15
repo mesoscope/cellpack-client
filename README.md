@@ -13,6 +13,9 @@ Front end website to interact with the cellPACK services running in AWS. This we
 1. `bun run dev`
 2. Navigate to http://localhost:5173/ in your browser
 
+### Run Tests
+1. `bun test`
+
 ### cellPACK Server
 This client interacts with the cellPACK server, which consists of a variety of backend services hosted in AWS to run [cellPACK packings](https://github.com/mesoscope/cellpack). These AWS services include:
 * **API Gateway**: cellPACK REST API providing this client with access to needed AWS resources for running and receiving data from cellPACK jobs. Includes the following endpoints:

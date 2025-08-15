@@ -1,6 +1,6 @@
 {
     "version": "1.0.0",
-    "format_version": "2.0",
+    "format_version": "2.1",
     "name": "one_sphere",
     "bounding_box": [
         [
@@ -16,6 +16,7 @@
     ],
     "objects": {
         "base": {
+            "name": "base",
             "jitter_attempts": 10,
             "orient_bias_range": [
                 -3.1415927,
@@ -43,6 +44,15 @@
                 0,
                 1
             ],
+            "partners": {
+                "all_partners": []
+            },
+            "representations": {
+                "mesh": null,
+                "atomic": null,
+                "packing": null,
+                "active": null
+            },
             "available_regions": {
                 "interior": {},
                 "surface": {},
@@ -51,6 +61,7 @@
             }
         },
         "sphere_25": {
+            "name": "sphere_25",
             "type": "single_sphere",
             "inherit": "base",
             "color": [
@@ -59,6 +70,15 @@
                 0.5
             ],
             "radius": 5,
+            "representations": {
+                "mesh": null,
+                "atomic": null,
+                "packing": null,
+                "active": null
+            },
+            "partners": {
+                "all_partners": []
+            },
             "max_jitter": [
                 1,
                 1,
@@ -66,8 +86,13 @@
             ]
         }
     },
+    "gradients": {},
     "composition": {
         "space": {
+            "count": null,
+            "molarity": null,
+            "name": "space",
+            "object": null,
             "regions": {
                 "interior": [
                     "A"
@@ -76,7 +101,10 @@
         },
         "A": {
             "object": "sphere_25",
-            "count": 1
+            "molarity": null,
+            "name": "A",
+            "count": 1,
+            "regions": {}
         }
     }
 }

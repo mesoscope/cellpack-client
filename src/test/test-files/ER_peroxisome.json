@@ -1,0 +1,177 @@
+{
+  "name": "ER_peroxisome",
+  "version": "struct_gradient_370574",
+  "format_version": "2.1",
+  "bounding_box": [
+    [
+      33.775,
+      35.375,
+      7.125
+    ],
+    [
+      274.225,
+      208.625,
+      106.875
+    ]
+  ],
+  "grid_file_path": "https://cellpack-analysis-data.s3.us-west-2.amazonaws.com/demo/370574_grid.dat",
+  "composition": {
+    "membrane": {
+      "name": "membrane",
+      "molarity": null,
+      "regions": {
+        "interior": [
+          "nucleus",
+          "struct",
+          {
+            "object": "peroxisome",
+            "count": 121
+          }
+        ]
+      },
+      "count": 1,
+      "priority": null,
+      "object": "membrane_mesh"
+    },
+    "nucleus": {
+      "name": "nucleus",
+      "priority": null,
+      "regions": {
+        "interior": []
+      },
+      "molarity": null,
+      "count": 1,
+      "object": "nucleus_mesh"
+    },
+    "struct": {
+      "name": "struct",
+      "regions": {
+        "interior": []
+      },
+      "molarity": null,
+      "count": 1,
+      "priority": null,
+      "object": "struct_mesh"
+    },
+    "bounding_area": {
+      "name": "bounding_area",
+      "priority": null,
+      "regions": {
+        "interior": [
+          "membrane"
+        ]
+      },
+      "object": null,
+      "count": null,
+      "molarity": null
+    }
+  },
+  "objects": {
+    "membrane_mesh": {
+      "name": "membrane_mesh",
+      "representations": {
+        "mesh": {
+          "path": "https://cellpack-analysis-data.s3.us-west-2.amazonaws.com/demo",
+          "name": "mem_mesh_370574.obj",
+          "format": "obj"
+        },
+        "atomic": null,
+        "packing": null,
+        "active": null
+      },
+      "partners": {
+        "all_partners": []
+      },
+      "type": "mesh",
+      "color": [
+        0.75,
+        0.75,
+        0.75
+      ]
+    },
+    "peroxisome": {
+      "name": "peroxisome",
+      "partners": {
+        "all_partners": []
+      },
+      "jitter_attempts": 300,
+      "radius": 2.37,
+      "gradient": "struct_gradient",
+      "representations": {
+        "mesh": null,
+        "active": null,
+        "packing": null,
+        "atomic": null
+      },
+      "packing_mode": "gradient",
+      "color": [
+        0,
+        1,
+        0
+      ],
+      "type": "single_sphere"
+    },
+    "nucleus_mesh": {
+      "name": "nucleus_mesh",
+      "color": [
+        0.25,
+        0.25,
+        0.25
+      ],
+      "partners": {
+        "all_partners": []
+      },
+      "representations": {
+        "mesh": {
+          "name": "nuc_mesh_370574.obj",
+          "path": "https://cellpack-analysis-data.s3.us-west-2.amazonaws.com/demo",
+          "format": "obj"
+        },
+        "atomic": null,
+        "active": null,
+        "packing": null
+      },
+      "type": "mesh"
+    },
+    "struct_mesh": {
+      "name": "struct_mesh",
+      "representations": {
+        "atomic": null,
+        "packing": null,
+        "active": null,
+        "mesh": {
+          "name": "struct_mesh_370574.obj",
+          "format": "obj",
+          "path": "https://cellpack-analysis-data.s3.us-west-2.amazonaws.com/demo"
+        }
+      },
+      "color": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "type": "mesh",
+      "partners": {
+        "all_partners": []
+      }
+    }
+  },
+  "gradients": {
+    "struct_gradient": {
+      "name": "struct_gradient",
+      "invert": null,
+      "mode": "surface",
+      "pick_mode": "linear",
+      "weight_mode": "exponential",
+      "weight_mode_settings": {
+        "decay_length": 0.01
+      },
+      "reversed": false,
+      "description": "gradient based on distance from the surface of the struct mesh",
+      "mode_settings": {
+        "object": "struct",
+        "scale_to_next_surface": false
+      }
+    }
+  }
+}

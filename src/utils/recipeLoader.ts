@@ -13,7 +13,7 @@ import { queryDocumentById, getDocsByIds } from "./firebase";
 
 const isFirebaseRef = (x: string | null | undefined) => {
     return x !== null && x !== undefined && typeof x == "string" && x.startsWith("firebase");
-}
+};
 
 const isInRefsByCollection = (ref: string, coll: string, refsByColl: RefsByCollection): boolean => {
     let refsForColl = {};
@@ -29,7 +29,7 @@ const isInRefsByCollection = (ref: string, coll: string, refsByColl: RefsByColle
         return false;
     }
     return ref in refsForColl;
-}
+};
 
 const addRef = (
     ref: string,
@@ -47,7 +47,7 @@ const addRef = (
         refsByColl.gradients[ref] = obj;
     }
     return refsByColl;
-}
+};
 
 const isDbDict = (x: object) => {
     if (typeof x == "object" && Object.keys(x).length > 0) {
@@ -59,7 +59,15 @@ const isDbDict = (x: object) => {
         return true;
     }
     return false;
-}
+};
+
+const firebaseBoundingBoxToArray = (bounding_box: object): [][] => {
+    const unpackedDict: [][] = [[]]
+    for (const [k, v] of Object.entries(bounding_box)) {
+        unpackedDict[Number(k)] = v;
+    }
+    return unpackedDict;
+};
 
 const resolveRefsInObject = (
     obj: FirebaseObject,
@@ -138,6 +146,9 @@ const convertCollectionToViewable = <T extends { name: string; id: string; dedup
 };
 
 const recipeToViewable = (recipe: FirebaseRecipe): ViewableRecipe => {
+    if (recipe.bounding_box && isDbDict(recipe.bounding_box)) {
+        recipe.bounding_box = firebaseBoundingBoxToArray(recipe.bounding_box);
+    }
     const viewableRecipe: ViewableRecipe = {
         name: recipe.name,
         version: recipe.version,
@@ -163,15 +174,7 @@ const resolveRefs = (
             doc.composition[compName] = resolveRefsInComposition(compositionObj, refsDict, doc);
         }
     }
-    if (doc.bounding_box && isDbDict(doc.bounding_box)) {
-        const unpackedDict: [][] = [[]]
-        for (const [k, v] of Object.entries(doc.bounding_box)) {
-            unpackedDict[Number(k)] = v;
-        }
-        doc.bounding_box = unpackedDict;
-    }
-    const viewable: ViewableRecipe = recipeToViewable(doc);
-    return viewable;
+    return recipeToViewable(doc);
 }
 
 const getRecipeDoc = async (id: string): Promise<FirebaseRecipe> => {
@@ -306,4 +309,4 @@ const getFirebaseRecipe = async (name: string): Promise<string> => {
 }
 
 
-export { getFirebaseRecipe };
+export { getFirebaseRecipe, isFirebaseRef };

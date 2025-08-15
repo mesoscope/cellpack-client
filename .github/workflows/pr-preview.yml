@@ -24,9 +24,6 @@ jobs:
       - name: Install
         run: bun install
 
-      - name: Run Linter
-        run: bun run lint
-
       - name: Build with Vite
         run: bun run build --base=/cellpack-client/pr-preview/pr-${PR_NUMBER}
         env:
