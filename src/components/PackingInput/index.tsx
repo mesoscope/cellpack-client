@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dictionary, PackingInputs } from "../../types";
 import { getPackingInputsDict } from "../../utils/firebase";
+import { Button } from "antd";
 import { getFirebaseRecipe } from "../../utils/recipeLoader";
 import Dropdown from "../Dropdown";
 import JSONViewer from "../JSONViewer";
@@ -14,7 +15,6 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
     const { startPacking } = props;
     const [selectedRecipeId, setSelectedRecipeId] = useState("");
     const [selectedConfigId, setSelectedConfigId] = useState("");
-    const [selectedInputId, setSelectedInputId] = useState("");
     const [inputOptions, setInputOptions] = useState<Dictionary<PackingInputs>>({});
     const [recipeStr, setRecipeStr] = useState<string>("");
     const [viewRecipe, setViewRecipe] = useState<boolean>(true);
@@ -28,7 +28,6 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
     }, []);
 
     const selectInput = async (inputName: string) => {
-        setSelectedInputId(inputName);
         const recipeId: string = inputOptions[inputName]?.recipe || "";
         const configId: string = inputOptions[inputName]?.config || "";
         await selectRecipe(recipeId);
@@ -54,14 +53,13 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
         <div>
             <div className="input-container">
                 <Dropdown
-                    value={selectedInputId}
                     placeholder="Select a recipe"
                     options={inputOptions}
                     onChange={selectInput}
                 />
-                <button onClick={runPacking} disabled={!selectedInputId}>
+                <Button onClick={runPacking} disabled={!selectedRecipeId} style={{ marginLeft: 5 }}>
                     Pack
-                </button>
+                </Button>
             </div>
             <div className="box">
                 <JSONViewer

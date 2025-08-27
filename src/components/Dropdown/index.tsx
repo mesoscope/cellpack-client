@@ -1,30 +1,29 @@
+import { Select } from "antd";
 import { FirebaseDict } from "../../types";
-import { FIRESTORE_FIELDS } from "../../constants/firebase";
 
 interface DropdownProps {
-    value: string;
     placeholder: string;
     options: FirebaseDict;
     onChange: (value: string) => void;
 }
 
 const Dropdown = (props: DropdownProps): JSX.Element => {
-    const { value, placeholder, options, onChange } = props;
+    const { placeholder, options, onChange } = props;
+    const selectOptions = Object.entries(options).map(([key]) => (
+        {
+            label: <span>{key}</span>,
+            value: key,
+        }
+    ));
 
     return (
-        <select
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-        >
-            <option value="" disabled>
-                {placeholder}
-            </option>
-            {Object.entries(options).map(([key, value]) => (
-                <option key={key} value={value[FIRESTORE_FIELDS.FIREBASE_ID]}>
-                    {key}
-                </option>
-            ))}
-        </select>
+        <Select
+            defaultValue={undefined}
+            onChange={onChange}
+            placeholder={placeholder}
+            options={selectOptions}
+            style={{ width: 200 }}
+        />
     );
 };
 

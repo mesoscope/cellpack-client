@@ -1,21 +1,13 @@
-.recipe-json {
-  max-height: 300px;
-  width: 450px;
-  overflow-y: auto;
+.recipe-box {
+  width: 600px;
+  margin-top: 10px;
 }
 
-.collapsible {
-  width: 450px;
-  margin-top: 5%;
-}
-
-textarea {
-  width: 450px;
+.json-content {
   height: 300px;
-  padding: 12px 20px;
-  box-sizing: border-box;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  font-size: 13px;
-  resize: none;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 14px;
+  resize: vertical;
 }

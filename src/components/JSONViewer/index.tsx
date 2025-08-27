@@ -1,3 +1,4 @@
+import { Collapse, Input } from "antd";
 import "./style.css";
 
 interface JSONViewerProps {
@@ -14,23 +15,28 @@ const JSONViewer = (props: JSONViewerProps): JSX.Element => {
     if (!content) {
         return (<></>)
     }
+    
+    const items = [{
+        key: "1",
+        label: title,
+        children: isEditable ? (
+            <Input.TextArea 
+                value={content} 
+                onChange={(e) => onChange?.(e.target.value)}
+                rows={14}
+            />
+        ) : (
+            <pre className="json-content">{content}</pre>
+        )
+    }];
+    
     return (
         <div className={`${title.toLowerCase()}-box`}>
-            <button type="button" className="collapsible" onClick={onToggle}>
-                {title}
-            </button>
-            <div className={`${title.toLowerCase()}-json`}>
-                {isVisible && (
-                    isEditable ? (
-                        <textarea 
-                            value={content} 
-                            onChange={(e) => onChange?.(e.target.value)}
-                        />
-                    ) : (
-                        <pre>{content}</pre>
-                    )
-                )}
-            </div>
+            <Collapse 
+                items={items}
+                activeKey={isVisible ? ["1"] : []}
+                onChange={() => onToggle()}
+            />
         </div>
     );
 };

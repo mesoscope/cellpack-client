@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
+import { Button } from "antd";
 import "./App.css";
 import { getResultPath, getDocById, getJobStatus, addRecipe } from "./utils/firebase";
 import { getFirebaseRecipe } from "./utils/recipeLoader";
@@ -138,7 +139,7 @@ function App() {
             {jobSucceeded && (
                 <div>
                     {runTime > 0 && (<h4>Time to Run: {runTime} sec</h4>)}
-                    <button onClick={toggleResults}>Results</button>
+                    <Button onClick={toggleResults}>Results</Button>
                 </div>
             )}
             {showResults && <Viewer resultUrl={resultUrl} />}
