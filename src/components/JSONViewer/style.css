@@ -19,3 +19,7 @@ textarea {
   font-size: 13px;
   resize: none;
 }
+
+pre {
+  text-align: left;
+}

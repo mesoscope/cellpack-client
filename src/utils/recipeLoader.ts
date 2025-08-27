@@ -225,7 +225,7 @@ const searchForRefs = async (
     return refsToObj
 }
 
-const unpackReferences = async (doc: FirebaseRecipe): Promise<string> => {
+const unpackReferences = async (doc: FirebaseRecipe): Promise<ViewableRecipe> => {
     // Step through the recipe, and search Firebase for the referenced paths
 
     // First, walk through the recipe's compositions, and resolve their references
@@ -299,14 +299,18 @@ const unpackReferences = async (doc: FirebaseRecipe): Promise<string> => {
 
     // Resolve references in doc using refsDict
     const resolvedDoc: ViewableRecipe = resolveRefs(doc, refsDict);
-    return JSON.stringify(resolvedDoc, null, 2);
+    return resolvedDoc;
 }
 
-const getFirebaseRecipe = async (name: string): Promise<string> => {
+const getFirebaseRecipe = async (name: string): Promise<ViewableRecipe> => {
     const recipe: FirebaseRecipe = await getRecipeDoc(name);
-    const unpackedRecipe: string = await unpackReferences(recipe);
+    const unpackedRecipe: ViewableRecipe = await unpackReferences(recipe);
     return unpackedRecipe;
 }
 
+const jsonToString = (json: ViewableRecipe): string => {
+    return JSON.stringify(json, null, 2);
+}
 
-export { getFirebaseRecipe, isFirebaseRef };
+
+export { getFirebaseRecipe, isFirebaseRef, jsonToString };
