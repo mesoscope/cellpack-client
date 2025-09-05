@@ -174,6 +174,16 @@ const resolveRefs = (
             doc.composition[compName] = resolveRefsInComposition(compositionObj, refsDict, doc);
         }
     }
+    // Handle Optional Gradients
+    if (doc.optional_gradients) {
+        for (const gradient of doc.optional_gradients) {
+            if (isFirebaseRef(gradient)) {
+                const gradientObj: FirebaseGradient = refsDict.gradients[gradient];
+                doc.gradients ??= {};
+                doc.gradients[gradientObj.name] = gradientObj;
+            }
+        }
+    }
     return recipeToViewable(doc);
 }
 
@@ -225,7 +235,7 @@ const searchForRefs = async (
     return refsToObj
 }
 
-const unpackReferences = async (doc: FirebaseRecipe): Promise<string> => {
+const unpackReferences = async (doc: FirebaseRecipe): Promise<ViewableRecipe> => {
     // Step through the recipe, and search Firebase for the referenced paths
 
     // First, walk through the recipe's compositions, and resolve their references
@@ -235,6 +245,14 @@ const unpackReferences = async (doc: FirebaseRecipe): Promise<string> => {
         for (const ref of Object.values(compositions)) {
             if (isFirebaseRef(ref.inherit) && typeof ref.inherit == 'string') {
                 refsToGet.push(ref.inherit);
+            }
+        }
+    }
+    if (doc.optional_gradients) {
+        const gradients: string[] = doc.optional_gradients;
+        for (const ref of gradients) {
+            if (isFirebaseRef(ref) && typeof ref == 'string') {
+                refsToGet.push(ref);
             }
         }
     }
@@ -299,14 +317,18 @@ const unpackReferences = async (doc: FirebaseRecipe): Promise<string> => {
 
     // Resolve references in doc using refsDict
     const resolvedDoc: ViewableRecipe = resolveRefs(doc, refsDict);
-    return JSON.stringify(resolvedDoc, null, 2);
+    return resolvedDoc;
 }
 
-const getFirebaseRecipe = async (name: string): Promise<string> => {
+const getFirebaseRecipe = async (name: string): Promise<ViewableRecipe> => {
     const recipe: FirebaseRecipe = await getRecipeDoc(name);
-    const unpackedRecipe: string = await unpackReferences(recipe);
+    const unpackedRecipe: ViewableRecipe = await unpackReferences(recipe);
     return unpackedRecipe;
 }
 
+const jsonToString = (json: ViewableRecipe): string => {
+    return JSON.stringify(json, null, 2);
+}
 
-export { getFirebaseRecipe, isFirebaseRef };
+
+export { getFirebaseRecipe, isFirebaseRef, jsonToString };

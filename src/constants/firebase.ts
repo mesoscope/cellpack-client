@@ -17,6 +17,7 @@ export const FIRESTORE_COLLECTIONS = {
     EDITED_RECIPES: "recipes_edited",
     JOB_STATUS: "job_status",
     PACKING_INPUTS: "example_packings",
+    EDITABLE_FIELDS: "editable_fields",
 };
 
 //firestore field names
@@ -37,6 +38,7 @@ export const FIRESTORE_FIELDS = {
     TIMESTAMP: "timestamp",
     RECIPE: "recipe",
     CONFIG: "config",
+    EDITABLE_FIELDS: "editable_fields",
 } as const;
 
 export const RETENTION_POLICY = {

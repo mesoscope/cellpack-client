@@ -11,3 +11,7 @@
   font-size: 14px;
   resize: vertical;
 }
+
+pre {
+  text-align: left;
+}

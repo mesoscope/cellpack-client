@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Button } from "antd";
 import "./App.css";
 import { getResultPath, getDocById, getJobStatus, addRecipe } from "./utils/firebase";
-import { getFirebaseRecipe } from "./utils/recipeLoader";
+import { getFirebaseRecipe, jsonToString } from "./utils/recipeLoader";
 import {
     getSubmitPackingUrl,
     JOB_STATUS,
@@ -35,7 +35,7 @@ function App() {
 
     const recipeHasChanged = async (recipeId: string, recipeString: string): Promise<boolean> => {
         const originalRecipe = await getFirebaseRecipe(recipeId);
-        return !(originalRecipe == recipeString);
+        return !(jsonToString(originalRecipe) == recipeString);
     }
 
     const recipeToFirebase = (recipe: string, path: string, id: string): object => {

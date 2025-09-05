@@ -157,6 +157,62 @@
     }
   },
   "gradients": {
+    "apical_gradient": {
+      "description": "gradient based on distance from a plane",
+      "invert": null,
+      "mode": "vector",
+      "mode_settings": {
+        "center": [
+          0,
+          0,
+          106.875
+        ],
+        "direction": [
+          0,
+          0,
+          1
+        ]
+      },
+      "name": "apical_gradient",
+      "pick_mode": "linear",
+      "reversed": false,
+      "weight_mode": "exponential",
+      "weight_mode_settings": {
+        "decay_length": 0.1
+      }
+    },
+    "membrane_gradient": {
+      "description": "gradient based on distance from the surface of the membrane mesh",
+      "invert": null,
+      "mode": "surface",
+      "mode_settings": {
+        "object": "membrane",
+        "scale_to_next_surface": false
+      },
+      "name": "membrane_gradient",
+      "pick_mode": "linear",
+      "reversed": false,
+      "weight_mode": "exponential",
+      "weight_mode_settings": {
+        "decay_length": 0.01
+      }
+    },
+    "nucleus_gradient": {
+      "description": "gradient based on distance from the surface of the nucleus mesh",
+      "invert": null,
+      "mode": "surface",
+      "mode_settings": {
+        "object": "nucleus",
+        "scale_to_next_surface": false
+      },
+      "name": "nucleus_gradient",
+      "pick_mode": "linear",
+      "reversed": false,
+      "weight_mode": "exponential",
+      "weight_mode_settings": {
+        "decay_length": 0.1
+      }
+    },
     "struct_gradient": {
       "name": "struct_gradient",
       "invert": null,

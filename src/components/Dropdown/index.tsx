@@ -1,9 +1,9 @@
 import { Select } from "antd";
-import { FirebaseDict } from "../../types";
+import { Dictionary, PackingInputs } from "../../types";
 
 interface DropdownProps {
     placeholder: string;
-    options: FirebaseDict;
+    options: Dictionary<PackingInputs>;
     onChange: (value: string) => void;
 }
 

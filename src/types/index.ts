@@ -4,6 +4,7 @@ export interface Document {
     recipe_path?: string;
     recipe?: string;
     config?: string;
+    editable_fields?: string[];
 }
 
 export type FirestoreDoc = Document & {
@@ -36,6 +37,32 @@ export interface Dictionary<T> {
 export type PackingInputs = {
     config: string;
     recipe: string;
+    editable_fields?: EditableField[];
+}
+
+export type EditableField = {
+    name: string;
+    data_type: string;
+    input_type: string;
+    description: string;
+    default: string | number;
+    path: string;
+    min?: number;
+    max?: number;
+    options?: string[];
+    gradient_options?: GradientOption[];
+}
+
+export type GradientOption = {
+    display_name: string;
+    value: string;
+    path: string;
+    strength_path?: string;
+    strength_default?: number;
+    strength_min?: number;
+    strength_max?: number;
+    strength_description?: string;
+    strength_display_name?: string;
 }
 
 export interface RefsByCollection {
@@ -128,6 +155,7 @@ export interface FirebaseRecipe {
     composition?: Dictionary<FirebaseComposition>;
     objects?: Dictionary<FirebaseObject>;
     gradients?: Dictionary<FirebaseGradient>;
+    optional_gradients?: string[];
 };
 
 export type Viewable<T extends { id: string; dedup_hash: string }> = Omit<T, "id" | "dedup_hash">;
