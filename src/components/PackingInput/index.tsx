@@ -121,7 +121,7 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
                             <h3>Options</h3>
                             {fieldsToDisplay.map((field) => (
                                 <InputSwitch
-                                    key={field.path}
+                                    key={field.id}
                                     displayName={field.name}
                                     inputType={field.input_type}
                                     dataType={field.data_type}
