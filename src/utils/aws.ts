@@ -1,26 +1,32 @@
 import JSZip from "jszip";
 import { getOutputsDirectory } from "./firebase";
-import { getS3ListUrl, getS3FileUrl } from "../constants/aws";
+import { getS3ListUrl } from "../constants/aws";
 
 
-export const parseS3ListResponse = (xmlText: string): string[] => {
+export const parseS3ListResponse = (xmlText: string, baseFolderPath: string): { fullPath: string; relativePath: string }[] => {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, "text/xml");
     const contents = xmlDoc.getElementsByTagName("Contents");
-    const fileNames: string[] = [];
+    const files: { fullPath: string; relativePath: string }[] = [];
     
     for (let i = 0; i < contents.length; i++) {
         const keyElement = contents[i].getElementsByTagName("Key")[0];
         if (keyElement) {
             const fullPath = keyElement.textContent || "";
-            const fileName = fullPath.split("/").pop();
-            if (fileName && fileName.length > 0) {
-                fileNames.push(fileName);
+            
+            if (fullPath && fullPath.length > 0 && fullPath !== baseFolderPath + "/") {
+                const relativePath = fullPath.startsWith(baseFolderPath + "/") 
+                    ? fullPath.substring(baseFolderPath.length + 1)
+                    : fullPath;
+                
+                if (relativePath && !relativePath.endsWith("/")) {
+                    files.push({ fullPath, relativePath });
+                }
             }
         }
     }
     
-    return fileNames;
+    return files;
 };
 
 export const downloadOutputsFromS3 = async (outputsDir: string, jobId: string) => {
@@ -37,25 +43,25 @@ export const downloadOutputsFromS3 = async (outputsDir: string, jobId: string) =
     
     const listResponse = await fetch(listUrl);
     const xmlText = await listResponse.text();
-    const fileNames = parseS3ListResponse(xmlText);
+    const files = parseS3ListResponse(xmlText, folderPath);
     
-    console.log(`Found ${fileNames.length} files:`, fileNames);
+    console.log(`Found ${files.length} files:`, files.map(f => f.relativePath));
     
     const zip = new JSZip();
     let filesAdded = 0;
     
-    for (const fileName of fileNames) {
-        const fileUrl = getS3FileUrl(bucketName, folderPath, fileName);
+    for (const file of files) {
+        const fileUrl = `${getS3ListUrl(bucketName, "").split("?")[0]}/${file.fullPath}`;
         console.log(`Downloading: ${fileUrl}`);
         
         const response = await fetch(fileUrl);
         if (response.ok) {
             const blob = await response.blob();
-            zip.file(fileName, blob);
+            zip.file(file.relativePath, blob);
             filesAdded++;
-            console.log(`Added ${fileName} to zip`);
+            console.log(`Added ${file.relativePath} to zip`);
         } else {
-            console.log(`Failed to download ${fileName}: ${response.status}`);
+            console.log(`Failed to download ${file.relativePath}: ${response.status}`);
         }
     }
     
