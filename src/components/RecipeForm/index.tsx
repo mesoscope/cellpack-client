@@ -1,19 +1,16 @@
 import { Button } from "antd";
-import { Dictionary, EditableField } from "../../types";
+import { useContext } from "react";
+import { PackingContext } from "../../context";
 import InputSwitch from "../InputSwitch";
 import "./style.css";
 
 interface RecipeFormProps {
     submitEnabled: boolean;
-    recipeId?: string;
-    fieldsToDisplay?: EditableField[];
-    submitPacking: () => Promise<void>;
-    changeHandler: (changes: Dictionary<string | number>) => void;
-    getCurrentValue: (path: string) => string | number | undefined;
 }
 
 const RecipeForm = (props: RecipeFormProps): JSX.Element => {
-    const { submitEnabled, recipeId, fieldsToDisplay, submitPacking, changeHandler, getCurrentValue } = props;
+    const { submitEnabled } = props;
+    const { recipeId, fieldsToDisplay, submitPacking } = useContext(PackingContext);
     return (
         <div className="recipe-form">
             {fieldsToDisplay && (
@@ -32,8 +29,6 @@ const RecipeForm = (props: RecipeFormProps): JSX.Element => {
                             options={field.options}
                             id={field.path}
                             gradientOptions={field.gradient_options}
-                            changeHandler={changeHandler}
-                            getCurrentValue={getCurrentValue}
                         />
                     ))}
                 </div>

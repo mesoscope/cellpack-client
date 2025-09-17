@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PackingContext } from "../../context";
 import { Dictionary, EditableField, PackingInputs } from "../../types";
 import { getPackingInputsDict } from "../../utils/firebase";
 import { getFirebaseRecipe, jsonToString } from "../../utils/recipeLoader";
@@ -90,30 +91,33 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
 
     return (
         <div>
-            <div className="recipe-select">
-                <div>Packing Recipe</div>
-                <Dropdown
-                    placeholder="Select an option"
-                    options={inputOptions}
-                    onChange={selectInput}
-                />
-            </div>
-            <div className="recipe-content">
-                <JSONViewer
-                    title="Recipe"
-                    content={recipeStr}
-                    isEditable={fieldsToDisplay === undefined}
-                    onChange={setRecipeStr}
-                />
-                <RecipeForm
-                    submitEnabled={submitEnabled}
-                    recipeId={selectedRecipeId}
-                    fieldsToDisplay={fieldsToDisplay}
-                    submitPacking={runPacking}
-                    changeHandler={handleFormChange}
-                    getCurrentValue={getCurrentValue}
-                />
-            </div>
+            <PackingContext.Provider value={{
+                recipeId: selectedRecipeId,
+                configId: selectedConfigId,
+                recipeString: recipeStr,
+                fieldsToDisplay: fieldsToDisplay,
+                submitPacking: runPacking,
+                changeHandler: handleFormChange,
+                getCurrentValue: getCurrentValue
+            }}>
+                <div className="recipe-select">
+                    <div>Packing Recipe</div>
+                    <Dropdown
+                        placeholder="Select an option"
+                        options={inputOptions}
+                        onChange={selectInput}
+                    />
+                </div>
+                <div className="recipe-content">
+                    <JSONViewer
+                        title="Recipe"
+                        content={recipeStr}
+                        isEditable={fieldsToDisplay === undefined}
+                        onChange={setRecipeStr}
+                    />
+                    <RecipeForm submitEnabled={submitEnabled} />
+                </div>
+            </PackingContext.Provider>
         </div>
     );
 };

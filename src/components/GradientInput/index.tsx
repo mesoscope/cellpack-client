@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { InputNumber, Select, Slider } from 'antd';
 import { Dictionary, GradientOption } from "../../types";
+import { PackingContext } from "../../context";
 import "./style.css";
 
 interface GradientStrength {
@@ -17,12 +18,11 @@ interface GradientInputProps {
     description: string;
     gradientOptions: GradientOption[];
     defaultValue: string;
-    changeHandler: (changes: Dictionary<string | number>) => void;
-    getCurrentValue: (path: string) => string | number | undefined;
 };
 
 const GradientInput = (props: GradientInputProps): JSX.Element => {
-    const { displayName, description, gradientOptions, defaultValue, changeHandler, getCurrentValue } = props;
+    const { displayName, description, gradientOptions, defaultValue } = props;
+    const { changeHandler, getCurrentValue } = useContext(PackingContext);
     const initialOption = gradientOptions.find(option => option.value === defaultValue);
     const initialGradientStrength: GradientStrength | undefined = initialOption && initialOption.strength_path ? {
         displayName: initialOption.strength_display_name || initialOption.display_name + " Strength",
