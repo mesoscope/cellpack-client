@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Input, InputNumber, Select, Slider } from 'antd';
+import { Dictionary, GradientOption } from "../../types";
 import GradientInput from "../GradientInput";
 import "./style.css";
-import { Dictionary, GradientOption } from "../../types";
 
 interface InputSwitchProps {
     displayName: string;

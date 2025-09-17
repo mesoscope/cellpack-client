@@ -1,22 +1,16 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { Layout, Typography, Button } from "antd";
-import "./App.css";
+import { Layout, Typography } from "antd";
 import { getResultPath, getDocById, getJobStatus, addRecipe } from "./utils/firebase";
 import { getFirebaseRecipe, jsonToString } from "./utils/recipeLoader";
-import {
-    getSubmitPackingUrl,
-    JOB_STATUS,
-} from "./constants/aws";
-import {
-    FIRESTORE_COLLECTIONS,
-    FIRESTORE_FIELDS,
-} from "./constants/firebase";
+import { getSubmitPackingUrl, JOB_STATUS } from "./constants/aws";
+import { FIRESTORE_COLLECTIONS, FIRESTORE_FIELDS } from "./constants/firebase";
 import { SIMULARIUM_EMBED_URL } from "./constants/urls";
-import { downloadOutputs } from "./utils/aws";
 import PackingInput from "./components/PackingInput";
 import Viewer from "./components/Viewer";
 import ErrorLogs from "./components/ErrorLogs";
+import StatusBar from "./components/StatusBar";
+import "./App.css";
 
 const { Header, Content, Footer } = Layout;
 const { Link } = Typography;
@@ -27,7 +21,6 @@ function App() {
     const [jobLogs, setJobLogs] = useState<string>("");
     const [resultUrl, setResultUrl] = useState<string>("");
     const [runTime, setRunTime] = useState<number>(0);
-    const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
     let start = 0;
 
@@ -63,7 +56,7 @@ function App() {
             const recipeJson = recipeToFirebase(recipeString, firebaseRecipe, recipeId);
             try {
                 await addRecipe(recipeId, recipeJson);
-            } catch(e) {
+            } catch (e) {
                 setJobStatus(JOB_STATUS.FAILED);
                 setJobLogs(String(e));
                 return;
@@ -121,15 +114,8 @@ function App() {
         const logStr: string = await getDocById(FIRESTORE_COLLECTIONS.JOB_STATUS, id);
         setJobLogs(logStr);
     };
-    const jobSucceeded = jobStatus == JOB_STATUS.DONE;
     const showLogs = jobStatus == JOB_STATUS.FAILED;
     const submitEnabled = (jobStatus == "" || jobStatus == JOB_STATUS.DONE || jobStatus == JOB_STATUS.FAILED);
-
-    const downloadResults = async (jobId: string) => {
-        setIsDownloading(true);
-        await downloadOutputs(jobId);
-        setIsDownloading(false);
-    }
 
     return (
         <div className="app-container">
@@ -139,25 +125,7 @@ function App() {
             </Header>
             <Content className="content-container">
                 <PackingInput startPacking={startPacking} submitEnabled={submitEnabled} />
-                {jobStatus && (
-                    <div className="status-row">
-                        <div className="status-container status-bar">
-                            <div><b>Status</b> {jobStatus}</div>
-                            {jobSucceeded && runTime > 0 && (<div><b>Run time</b> {runTime} sec</div>)}
-                        </div>
-                        {jobSucceeded && (
-                            <Button 
-                                onClick={() => downloadResults(jobId)} 
-                                loading={isDownloading}
-                                color="primary"
-                                variant="filled"
-                                className="download-button"
-                            >
-                                Download Packing Result
-                            </Button>
-                        )}
-                    </div>
-                )}
+                {jobStatus && <StatusBar jobStatus={jobStatus} runTime={runTime} jobId={jobId} />}
                 {showLogs && <ErrorLogs errorLogs={jobLogs} getLogs={getLogs} />}
             </Content>
             {resultUrl && <Viewer resultUrl={resultUrl} />}

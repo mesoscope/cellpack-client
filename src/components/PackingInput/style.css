@@ -1,18 +1,3 @@
-.recipe-json {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 48%;
-}
-
-.recipe-form {
-  width: 48%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-align: left;
-}
-
 .recipe-select {
   display: flex;
   white-space: nowrap;

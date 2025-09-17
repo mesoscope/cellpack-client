@@ -30,34 +30,6 @@
   margin-top: 36px;
 }
 
-.status-container {
-  display: flex;
-  flex-direction: row;
-  gap: 30px;
-  border: 1px solid #D3D3D3;
-  padding: 10px;
-  border-radius: 10px;
-  padding-left: 20px;
-}
-
-.status-row {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  align-items: stretch;
-}
-
-.status-bar {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.download-button {
-  height: auto;
-  min-height: 48px;
-}
-
 .footer {
   height: 128px;
   background-color: #ffffff;
