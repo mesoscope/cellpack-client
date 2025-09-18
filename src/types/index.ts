@@ -35,9 +35,11 @@ export interface Dictionary<T> {
 }
 
 export type PackingInputs = {
-    config: string;
-    recipe: string;
-    editable_fields?: EditableField[];
+    configId: string;
+    recipeId: string;
+    initialRecipeObj: ViewableRecipe;
+    currentRecipeObj: ViewableRecipe;
+    editableFields?: EditableField[];
 }
 
 export type EditableField = {

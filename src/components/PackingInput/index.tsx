@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { PackingContext } from "../../context";
-import { Dictionary, EditableField, PackingInputs } from "../../types";
-import { getPackingInputsDict } from "../../utils/firebase";
-import { getFirebaseRecipe, jsonToString } from "../../utils/recipeLoader";
+import { Dictionary, PackingInputs } from "../../types";
+import { getPackingInputsDict } from "../../utils/recipeLoader";
+import { jsonToString } from "../../utils/recipeLoader";
 import Dropdown from "../Dropdown";
 import JSONViewer from "../JSONViewer";
 import RecipeForm from "../RecipeForm";
@@ -16,44 +16,49 @@ interface PackingInputProps {
 
 const PackingInput = (props: PackingInputProps): JSX.Element => {
     const { startPacking, submitEnabled } = props;
-    const [selectedRecipeId, setSelectedRecipeId] = useState("");
-    const [selectedConfigId, setSelectedConfigId] = useState("");
+    const [selectedInput, setSelectedInput] = useState<PackingInputs | undefined>(undefined);
     const [inputOptions, setInputOptions] = useState<Dictionary<PackingInputs>>({});
+    const [recipesLoading, setRecipesLoading] = useState<boolean>(true);
     const [recipeStr, setRecipeStr] = useState<string>("");
-    const [fieldsToDisplay, setFieldsToDisplay] = useState<EditableField[] | undefined>(undefined);
 
     useEffect(() => {
         const fetchData = async () => {
+            setRecipesLoading(true);
             const inputDict = await getPackingInputsDict();
             setInputOptions(inputDict);
+            setRecipesLoading(false);
         };
         fetchData();
     }, []);
 
     const selectInput = async (inputName: string) => {
-        const recipeId: string = inputOptions[inputName]?.recipe || "";
-        const configId: string = inputOptions[inputName]?.config || "";
-        setFieldsToDisplay(inputOptions[inputName]?.editable_fields || undefined);
-        await selectRecipe(recipeId);
-        setSelectedConfigId(configId);
-    }
+        if (!inputOptions[inputName]) return;
 
-    const selectRecipe = async (recipeId: string) => {
-        setSelectedRecipeId(recipeId);
-        const recJson = await getFirebaseRecipe(recipeId);
-        const recStr = jsonToString(recJson);
-        setRecipeStr(recStr);
-    }
+        // Reset current recipe to deep copy of initial recipe when switching inputs
+        setSelectedInput({
+            ...inputOptions[inputName],
+            currentRecipeObj: JSON.parse(JSON.stringify(inputOptions[inputName].initialRecipeObj))
+        });
+
+        const recString = jsonToString(inputOptions[inputName].initialRecipeObj);
+        console.log("Setting recipe string to: ", recString);
+        setRecipeStr(recString);
+    };
 
     const runPacking = async () => {
-        startPacking(selectedRecipeId, selectedConfigId, recipeStr);
+        if (!selectedInput) return;
+
+        const recString = jsonToString(selectedInput.currentRecipeObj);
+        startPacking(selectedInput.recipeId, selectedInput.configId, recString);
     };
 
     const handleFormChange = (changes: Dictionary<string | number>) => {
-        const recipeObj = JSON.parse(recipeStr);
+        if (!selectedInput) return;
+
+        const recObj: any = selectedInput.currentRecipeObj;
         for (const [id, value] of Object.entries(changes)) {
             const keys = id.split('.');
-            let current = recipeObj;
+            let current = recObj;
             for (let i = 0; i < keys.length; i++) {
                 const key = keys[i];
 
@@ -71,14 +76,15 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
                 }
             }
         }
-        const updatedRecipeStr = JSON.stringify(recipeObj, null, 2);
-        setRecipeStr(updatedRecipeStr);
+        setSelectedInput( { ...selectedInput, currentRecipeObj: recObj })
+        setRecipeStr(jsonToString(recObj));
     };
 
     const getCurrentValue = (path: string): string | number | undefined => {
-        const recipeObj = JSON.parse(recipeStr);
+        if (!selectedInput) return undefined;
+
         const keys = path.split('.');
-        let current = recipeObj;
+        let current: any = selectedInput.currentRecipeObj;
         for (let i = 0; i < keys.length; i++) {
             const key = keys[i];
             if (current[key] === undefined) {
@@ -89,13 +95,23 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
         return current;
     }
 
+    const updateRecipeStr = (newStr: string) => {
+        if (!selectedInput) return;
+        try {
+            const newObj = JSON.parse(newStr);
+            setSelectedInput( { ...selectedInput, currentRecipeObj: newObj } )
+            setRecipeStr(newStr);
+        } catch (e) {
+            console.error("Invalid JSON string: ", e);
+            setRecipeStr(newStr);
+            return;
+        }
+    }
+
     return (
         <div>
             <PackingContext.Provider value={{
-                recipeId: selectedRecipeId,
-                configId: selectedConfigId,
-                recipeString: recipeStr,
-                fieldsToDisplay: fieldsToDisplay,
+                selectedInput: selectedInput,
                 submitPacking: runPacking,
                 changeHandler: handleFormChange,
                 getCurrentValue: getCurrentValue
@@ -106,14 +122,15 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
                         placeholder="Select an option"
                         options={inputOptions}
                         onChange={selectInput}
+                        loading={recipesLoading}
                     />
                 </div>
                 <div className="recipe-content">
                     <JSONViewer
                         title="Recipe"
                         content={recipeStr}
-                        isEditable={fieldsToDisplay === undefined}
-                        onChange={setRecipeStr}
+                        isEditable={selectedInput?.editableFields === undefined}
+                        onChange={updateRecipeStr}
                     />
                     <RecipeForm submitEnabled={submitEnabled} />
                 </div>

@@ -10,13 +10,14 @@ interface RecipeFormProps {
 
 const RecipeForm = (props: RecipeFormProps): JSX.Element => {
     const { submitEnabled } = props;
-    const { recipeId, fieldsToDisplay, submitPacking } = useContext(PackingContext);
+    const { selectedInput, submitPacking } = useContext(PackingContext);
+
     return (
         <div className="recipe-form">
-            {fieldsToDisplay && (
+            {selectedInput?.editableFields && (
                 <div className="input-container">
                     <h3>Options</h3>
-                    {fieldsToDisplay.map((field) => (
+                    {selectedInput.editableFields.map((field) => (
                         <InputSwitch
                             key={field.id}
                             displayName={field.name}
@@ -33,7 +34,7 @@ const RecipeForm = (props: RecipeFormProps): JSX.Element => {
                     ))}
                 </div>
             )}
-            { recipeId && (
+            { selectedInput && (
                 <Button
                     onClick={submitPacking}
                     color="primary"

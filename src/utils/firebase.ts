@@ -19,12 +19,7 @@ import {
     FIRESTORE_FIELDS,
     RETENTION_POLICY,
 } from "../constants/firebase";
-import {
-    FirestoreDoc,
-    PackingInputs,
-    Dictionary,
-    EditableField,
-} from "../types";
+import { FirestoreDoc } from "../types";
 
 const getEnvVar = (key: string): string => {
     // check if we're in a browser environment (Vite)
@@ -126,46 +121,6 @@ const getAllDocsFromCollection = async (collectionName: string) => {
     return mapQuerySnapshotToDocs(querySnapshot);
 };
 
-const getEditableFieldsList = async (editable_field_ids: string[]): Promise<EditableField[]|undefined> => {
-    if (editable_field_ids.length === 0) {
-        return undefined;
-    }
-    const querySnapshot = await queryDocumentsByIds(FIRESTORE_COLLECTIONS.EDITABLE_FIELDS, editable_field_ids);
-    const docs = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-        data_type: doc.data().data_type,
-        input_type: doc.data().input_type,
-        description: doc.data().description,
-        default: doc.data().default,
-        min: doc.data().min,
-        max: doc.data().max,
-        options: doc.data().options,
-        gradient_options: doc.data().gradient_options,
-        path: doc.data().path,
-    }));
-    return docs;
-};
-
-const getPackingInputsDict = async (): Promise<Dictionary<PackingInputs>> => {
-    const docs = await getAllDocsFromCollection(FIRESTORE_COLLECTIONS.PACKING_INPUTS);
-    const inputsDict: Dictionary<PackingInputs> = {};
-    for (const doc of docs) {
-        const name = doc[FIRESTORE_FIELDS.NAME];
-        const config = doc[FIRESTORE_FIELDS.CONFIG];
-        const recipe = doc[FIRESTORE_FIELDS.RECIPE];
-        const editableFields = await getEditableFieldsList(doc[FIRESTORE_FIELDS.EDITABLE_FIELDS] || []);
-        if (name && config && recipe) {
-            inputsDict[name] = {
-                [FIRESTORE_FIELDS.CONFIG]: config,
-                [FIRESTORE_FIELDS.RECIPE]: recipe,
-                [FIRESTORE_FIELDS.EDITABLE_FIELDS]: editableFields
-            };
-        }
-    }
-    return inputsDict;
-}
-
 const getDocById = async (coll: string, id: string) => {
     const docs = await getAllDocsFromCollection(coll);
     const doc = docs.find(d => d.id === id);
@@ -213,4 +168,4 @@ const docCleanup = async () => {
         console.log(`Cleaned up ${deletePromises.length} documents from ${collectionConfig.name}`);
     }
 }
-export { db, queryDocumentById, getDocById, getDocsByIds, getJobStatus, getResultPath, addRecipe, docCleanup, getPackingInputsDict, getOutputsDirectory };
+export { db, queryDocumentById, getDocById, getDocsByIds, getJobStatus, getResultPath, addRecipe, docCleanup, getAllDocsFromCollection, getOutputsDirectory, queryDocumentsByIds };

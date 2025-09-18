@@ -1,21 +1,15 @@
 import { createContext } from "react";
-import { Dictionary, EditableField } from "./types";
+import { Dictionary, PackingInputs } from "./types";
 
 interface PackingContextType {
-    recipeId: string;
-    configId: string;
-    recipeString: string;
-    fieldsToDisplay?: EditableField[];
+    selectedInput: PackingInputs | undefined,
     changeHandler: (updates: Dictionary<string | number>) => void;
     getCurrentValue: (path: string) => string | number | undefined;
     submitPacking: () => Promise<void>;
 };
 
 export const PackingContext = createContext<PackingContextType>({
-    recipeId: "",
-    configId: "",
-    recipeString: "",
-    fieldsToDisplay: undefined,
+    selectedInput: undefined,
     changeHandler: async () => {},
     getCurrentValue: () => undefined,
     submitPacking: async () => {},

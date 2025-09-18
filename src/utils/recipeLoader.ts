@@ -1,15 +1,17 @@
 import { FIRESTORE_COLLECTIONS, FIRESTORE_FIELDS } from "../constants/firebase";
 import {
     Dictionary,
+    EditableField,
     FirebaseComposition,
     FirebaseGradient,
     FirebaseObject,
     FirebaseRecipe,
+    PackingInputs,
     RegionObject,
     RefsByCollection,
     ViewableRecipe,
 } from "../types";
-import { queryDocumentById, getDocsByIds } from "./firebase";
+import { queryDocumentById, getDocsByIds, queryDocumentsByIds, getAllDocsFromCollection } from "./firebase";
 
 const isFirebaseRef = (x: string | null | undefined) => {
     return x !== null && x !== undefined && typeof x == "string" && x.startsWith("firebase");
@@ -330,5 +332,48 @@ const jsonToString = (json: ViewableRecipe): string => {
     return JSON.stringify(json, null, 2);
 }
 
+const getEditableFieldsList = async (editable_field_ids: string[]): Promise<EditableField[]|undefined> => {
+    if (editable_field_ids.length === 0) {
+        return undefined;
+    }
+    const querySnapshot = await queryDocumentsByIds(FIRESTORE_COLLECTIONS.EDITABLE_FIELDS, editable_field_ids);
+    const docs = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+        data_type: doc.data().data_type,
+        input_type: doc.data().input_type,
+        description: doc.data().description,
+        default: doc.data().default,
+        min: doc.data().min,
+        max: doc.data().max,
+        options: doc.data().options,
+        gradient_options: doc.data().gradient_options,
+        path: doc.data().path,
+    }));
+    return docs;
+};
 
-export { getFirebaseRecipe, isFirebaseRef, jsonToString };
+const getPackingInputsDict = async (): Promise<Dictionary<PackingInputs>> => {
+    const docs = await getAllDocsFromCollection(FIRESTORE_COLLECTIONS.PACKING_INPUTS);
+    const inputsDict: Dictionary<PackingInputs> = {};
+    for (const doc of docs) {
+        const name = doc[FIRESTORE_FIELDS.NAME];
+        const config = doc[FIRESTORE_FIELDS.CONFIG];
+        const recipe = doc[FIRESTORE_FIELDS.RECIPE];
+        const editableFields = await getEditableFieldsList(doc[FIRESTORE_FIELDS.EDITABLE_FIELDS] || []);
+        if (name && config && recipe) {
+            const initialRecipeObj = await getFirebaseRecipe(recipe);
+            inputsDict[name] = {
+                configId: config,
+                recipeId: recipe,
+                initialRecipeObj: initialRecipeObj,
+                currentRecipeObj: JSON.parse(JSON.stringify(initialRecipeObj)),
+                editableFields: editableFields
+            };
+        }
+    }
+    return inputsDict;
+}
+
+
+export { getFirebaseRecipe, isFirebaseRef, jsonToString, getPackingInputsDict };
