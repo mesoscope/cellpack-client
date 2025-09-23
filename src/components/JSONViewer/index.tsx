@@ -1,17 +1,18 @@
 import { Collapse, Input } from "antd";
+import { useState } from "react";
 import "./style.css";
 
 interface JSONViewerProps {
     title: string;
     content: string;
-    isVisible: boolean;
-    isEditable?: boolean;
-    onToggle: () => void;
-    onChange?: (value: string) => void;
+    isEditable: boolean;
+    onChange: (value: string) => void;
 }
 
 const JSONViewer = (props: JSONViewerProps): JSX.Element => {
-    const { title, content, isVisible, isEditable = false, onToggle, onChange } = props;
+    const { title, content, isEditable, onChange } = props;
+    const [viewContent, setViewContent] = useState<boolean>(true);
+
     if (!content) {
         return (<></>)
     }
@@ -22,7 +23,7 @@ const JSONViewer = (props: JSONViewerProps): JSX.Element => {
         children: isEditable ? (
             <Input.TextArea 
                 value={content} 
-                onChange={(e) => onChange?.(e.target.value)}
+                onChange={(e) => onChange(e.target.value)}
                 rows={14}
             />
         ) : (
@@ -34,8 +35,8 @@ const JSONViewer = (props: JSONViewerProps): JSX.Element => {
         <div className={`${title.toLowerCase()}-box`}>
             <Collapse 
                 items={items}
-                activeKey={isVisible ? ["1"] : []}
-                onChange={() => onToggle()}
+                activeKey={viewContent ? ["1"] : []}
+                onChange={() => setViewContent(!viewContent)}
             />
         </div>
     );
