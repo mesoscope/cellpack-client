@@ -12,8 +12,6 @@
 }
 
 .header {
-  color: #000000E0;
-  background-color: #ffffff;
   width: 90vw;
   display: flex;
   align-items: center;
@@ -32,6 +30,5 @@
 
 .footer {
   height: 128px;
-  background-color: #ffffff;
   width: 100%;
 }

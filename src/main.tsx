@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import './index.css'
 import App from './App.tsx'
 import { decodeGitHubPagesUrl, isEncodedPathUrl, tryRemoveHashRouting } from "./utils/gh_routing";
+import { ThemeRoot } from './style/themeRoot.tsx'
 
 // Decode URL path if it was encoded for GitHub pages or uses hash routing.
 const locationUrl = new URL(window.location.toString());
@@ -32,8 +33,10 @@ const router = createBrowserRouter(
   { basename: import.meta.env.BASE_URL }
 );
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
-)
+createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+        <ThemeRoot>
+            <RouterProvider router={router} />
+        </ThemeRoot>
+    </StrictMode>
+);
