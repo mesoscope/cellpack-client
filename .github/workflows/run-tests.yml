@@ -4,6 +4,9 @@ on: pull_request
 jobs:
   static-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,7 +20,15 @@ jobs:
       - name: Run Linter
         run: bun run lint
 
+      - name: Run Typechecker
+        # Run type check even if the previous linter step failed
+        if: success() || failure()
+        run: bun run typeCheck
+
       - name: Run Tests
         # Run test even if the previous step(s) failed
         if: success() || failure()
-        run: bun test
+        run: bun run test --coverage --run
+
+      - name: Vitest Coverage Report
+        uses: davelosert/vitest-coverage-report-action@v2.1.1
