@@ -1,19 +1,22 @@
 import { Button } from "antd";
-import { Dictionary, EditableField } from "../../types";
 import InputSwitch from "../InputSwitch";
 import "./style.css";
+import {
+    useSelectedRecipeId,
+    useFieldsToDisplay,
+    useIsPacking,
+} from "../../state/store";
 
 interface RecipeFormProps {
     submitEnabled: boolean;
-    recipeId?: string;
-    fieldsToDisplay?: EditableField[];
-    submitPacking: () => Promise<void>;
-    changeHandler: (changes: Dictionary<string | number>) => void;
-    getCurrentValue: (path: string) => string | number | undefined;
+    onStartPacking: () => Promise<void>;
 }
 
-const RecipeForm = (props: RecipeFormProps): JSX.Element => {
-    const { submitEnabled, recipeId, fieldsToDisplay, submitPacking, changeHandler, getCurrentValue } = props;
+const RecipeForm = ({ submitEnabled, onStartPacking }: RecipeFormProps) => {
+    const recipeId = useSelectedRecipeId();
+    const fieldsToDisplay = useFieldsToDisplay();
+    const isPacking = useIsPacking();
+
     return (
         <div className="recipe-form">
             {fieldsToDisplay && (
@@ -32,19 +35,17 @@ const RecipeForm = (props: RecipeFormProps): JSX.Element => {
                             options={field.options}
                             id={field.path}
                             gradientOptions={field.gradient_options}
-                            changeHandler={changeHandler}
-                            getCurrentValue={getCurrentValue}
                         />
                     ))}
                 </div>
             )}
             {recipeId && (
                 <Button
-                    onClick={submitPacking}
+                    onClick={onStartPacking}
                     color="primary"
                     variant="filled"
-                    disabled={!submitEnabled}
-                    style={{ width: '100%' }}
+                    disabled={isPacking || !submitEnabled}
+                    style={{ width: "100%" }}
                 >
                     Pack!
                 </Button>

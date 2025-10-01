@@ -11,13 +11,16 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@types/lodash-es": "^4.17.12",
     "antd": "^5.27.1",
     "firebase": "^11.2.0",
     "jszip": "^3.10.1",
+    "lodash-es": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.22.2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
