@@ -99,12 +99,6 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
                 />
             </div>
             <div className="recipe-content">
-                <JSONViewer
-                    title="Recipe"
-                    content={recipeStr}
-                    isEditable={fieldsToDisplay === undefined}
-                    onChange={setRecipeStr}
-                />
                 <RecipeForm
                     submitEnabled={submitEnabled}
                     recipeId={selectedRecipeId}
@@ -112,6 +106,12 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
                     submitPacking={runPacking}
                     changeHandler={handleFormChange}
                     getCurrentValue={getCurrentValue}
+                />
+                <JSONViewer
+                    title="Recipe"
+                    content={recipeStr}
+                    isEditable={fieldsToDisplay === undefined}
+                    onChange={setRecipeStr}
                 />
             </div>
         </div>
