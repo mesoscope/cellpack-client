@@ -46,7 +46,6 @@ export type EditableField = {
     data_type: string;
     input_type: string;
     description: string;
-    default: string | number;
     path: string;
     min?: number;
     max?: number;

@@ -16,7 +16,6 @@ interface InputSwitchProps {
     dataType: string;
     description: string;
     id: string;
-    defaultValue: string | number;
     min?: number;
     max?: number;
     conversionFactor?: number;
@@ -26,7 +25,7 @@ interface InputSwitchProps {
 }
 
 const InputSwitch = (props: InputSwitchProps): JSX.Element => {
-    const { displayName, inputType, dataType, description, defaultValue, min, max, options, id, gradientOptions, conversionFactor, unit } = props;
+    const { displayName, inputType, dataType, description, min, max, options, id, gradientOptions, conversionFactor, unit } = props;
 
     const selectedRecipeId = useSelectedRecipeId();
     const updateRecipeObj = useUpdateRecipeObj();
@@ -37,15 +36,21 @@ const InputSwitch = (props: InputSwitchProps): JSX.Element => {
     // different unit in the UI than is stored in the recipe
     const conversion = conversionFactor ?? 1;
 
-    // Stable getter for current value, with default fallback
+    // Stable getter for current value
     const getCurrentValueMemo = useCallback(() => {
-        const v = getCurrentValue(id);
-        let value = v ?? defaultValue;
+        let value = getCurrentValue(id);
+        if (!value) {
+            if (dataType === "integer" || dataType === "float") {
+                value = min ?? 0;
+            } else {
+                value = "";
+            }
+        }
         if (typeof value == "number") {
             value = value * conversion;
         }
         return value;
-    }, [getCurrentValue, id, defaultValue, conversion]);
+    }, [getCurrentValue, id, conversion, dataType, min]);
 
     // Local controlled state for the input UI
     const [value, setValue] = useState<string | number>(getCurrentValueMemo());
