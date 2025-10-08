@@ -13,7 +13,6 @@ export const FIRESTORE_COLLECTIONS = {
     OBJECTS: "objects",
     GRADIENTS: "gradients",
     COMPOSITION: "composition",
-    EXAMPLE_RECIPES: "example_recipes",
     EDITED_RECIPES: "recipes_edited",
     JOB_STATUS: "job_status",
     PACKING_INPUTS: "example_packings",

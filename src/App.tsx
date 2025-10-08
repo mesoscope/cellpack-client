@@ -41,6 +41,7 @@ function App() {
         }
         recipeJson[FIRESTORE_FIELDS.RECIPE_PATH] = path;
         recipeJson[FIRESTORE_FIELDS.NAME] = id;
+        recipeJson[FIRESTORE_FIELDS.TIMESTAMP] = Date.now();
         return recipeJson;
     }
 
