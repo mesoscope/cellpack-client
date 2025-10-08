@@ -40,6 +40,7 @@ const InputSwitch = (props: InputSwitchProps): JSX.Element => {
     const getCurrentValueMemo = useCallback(() => {
         let value = getCurrentValue(id);
         if (!value) {
+            // Default to min or 0 if numeric type, othewise empty string
             if (dataType === "integer" || dataType === "float") {
                 value = min ?? 0;
             } else {
