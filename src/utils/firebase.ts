@@ -137,7 +137,6 @@ const getEditableFieldsList = async (editable_field_ids: string[]): Promise<Edit
         data_type: doc.data().data_type,
         input_type: doc.data().input_type,
         description: doc.data().description,
-        default: doc.data().default,
         min: doc.data().min,
         max: doc.data().max,
         options: doc.data().options,

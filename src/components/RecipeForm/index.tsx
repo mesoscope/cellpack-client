@@ -28,7 +28,6 @@ const RecipeForm = ({ onStartPacking }: RecipeFormProps) => {
                             inputType={field.input_type}
                             dataType={field.data_type}
                             description={field.description}
-                            defaultValue={field.default}
                             min={field.min}
                             max={field.max}
                             options={field.options}
