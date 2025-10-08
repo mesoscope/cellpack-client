@@ -12,3 +12,9 @@
     justify-content: left;
     width: 60%;
 }
+
+.input-content {
+    display: flex;
+    flex-direction: row;
+    width: 60%;
+}

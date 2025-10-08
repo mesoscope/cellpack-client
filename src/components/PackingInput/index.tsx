@@ -70,7 +70,7 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
                 />
             </div>
             <div className="recipe-content">
-                <RecipeForm onStartPacking={handleStartPacking} />
+                <RecipeForm onStartPacking={handleStartPacking}/>
                 <JSONViewer
                     title="Recipe"
                     content={recipeString}
