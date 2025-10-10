@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { Layout, Typography } from "antd";
-import { getResultPath, getDocById, getJobStatus, addRecipe } from "./utils/firebase";
+import { addRecipe, getJobStatus } from "./utils/firebase";
 import { getFirebaseRecipe, jsonToString } from "./utils/recipeLoader";
 import { getSubmitPackingUrl, JOB_STATUS } from "./constants/aws";
-import { FIRESTORE_COLLECTIONS, FIRESTORE_FIELDS } from "./constants/firebase";
+import { FIRESTORE_FIELDS } from "./constants/firebase";
 import { SIMULARIUM_EMBED_URL } from "./constants/urls";
 import PackingInput from "./components/PackingInput";
 import Viewer from "./components/Viewer";
@@ -20,6 +20,7 @@ function App() {
     const [jobStatus, setJobStatus] = useState("");
     const [jobLogs, setJobLogs] = useState<string>("");
     const [resultUrl, setResultUrl] = useState<string>("");
+    const [outputDir, setOutputDir] = useState<string>("");
     const [runTime, setRunTime] = useState<number>(0);
 
     let start = 0;
@@ -86,35 +87,25 @@ function App() {
 
     const checkStatus = async (jobIdFromSubmit: string) => {
         const id = jobIdFromSubmit || jobId;
-        let localJobStatus = await getJobStatus(id);
-        while (localJobStatus !== JOB_STATUS.DONE && localJobStatus !== JOB_STATUS.FAILED) {
+        let jobStatusObj = await getJobStatus(id);
+        while (jobStatusObj?.status !== JOB_STATUS.DONE && jobStatusObj?.status !== JOB_STATUS.FAILED) {
             await sleep(500);
-            const newJobStatus = await getJobStatus(id);
-            if (localJobStatus !== newJobStatus) {
-                localJobStatus = newJobStatus;
-                setJobStatus(newJobStatus);
+            const newJobStatusObj = await getJobStatus(id);
+            if (newJobStatusObj && jobStatusObj?.status !== newJobStatusObj.status) {
+                jobStatusObj = newJobStatusObj;
+                setJobStatus(newJobStatusObj.status);
             }
         }
         const range = (Date.now() - start) / 1000;
         setRunTime(range);
-        if (localJobStatus == JOB_STATUS.DONE) {
-            fetchResultUrl(id);
-        } else if (localJobStatus == JOB_STATUS.FAILED) {
-            getLogs(id);
+        if (jobStatusObj?.status == JOB_STATUS.DONE) {
+            setResultUrl(SIMULARIUM_EMBED_URL + jobStatusObj?.result_path);
+            setOutputDir(jobStatusObj?.outputs_directory || "");
+        } else if (jobStatusObj?.status == JOB_STATUS.FAILED) {
+            setJobLogs(jobStatusObj?.error_message || "Unknown error");
         }
     };
 
-    const fetchResultUrl = async (jobIdFromSubmit?: string) => {
-        const id = jobIdFromSubmit || jobId;
-        const url = await getResultPath(id);
-        setResultUrl(SIMULARIUM_EMBED_URL + url);
-    };
-
-    const getLogs = async (jobIdFromSubmit?: string) => {
-        const id = jobIdFromSubmit || jobId;
-        const logStr: string = await getDocById(FIRESTORE_COLLECTIONS.JOB_STATUS, id);
-        setJobLogs(logStr);
-    };
     const showLogs = jobStatus == JOB_STATUS.FAILED;
 
     return (
@@ -125,8 +116,8 @@ function App() {
             </Header>
             <Content className="content-container">
                 <PackingInput startPacking={startPacking} />
-                {jobStatus && <StatusBar jobStatus={jobStatus} runTime={runTime} jobId={jobId} />}
-                {showLogs && <ErrorLogs errorLogs={jobLogs} getLogs={getLogs} />}
+                {jobStatus && <StatusBar jobStatus={jobStatus} runTime={runTime} jobId={jobId} outputDir={outputDir} />}
+                {showLogs && <ErrorLogs errorLogs={jobLogs} />}
             </Content>
             {resultUrl && <Viewer resultUrl={resultUrl} />}
         </div>

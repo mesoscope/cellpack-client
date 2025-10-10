@@ -78,7 +78,9 @@ export const downloadOutputsFromS3 = async (outputsDir: string, jobId: string) =
     console.log(`Downloaded zip with ${filesAdded} files`);
 };
 
-export const downloadOutputs = async (jobId: string) => {
-    const outputsDir = await getOutputsDirectory(jobId);
+export const downloadOutputs = async (jobId: string, outputsDir?: string) => {
+    if (!outputsDir) {
+        outputsDir = await getOutputsDirectory(jobId);
+    }
     await downloadOutputsFromS3(outputsDir, jobId);
 }

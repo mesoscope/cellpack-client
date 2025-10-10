@@ -24,6 +24,7 @@ import {
     PackingInputs,
     Dictionary,
     EditableField,
+    JobStatusObject,
 } from "../types";
 
 const getEnvVar = (key: string): string => {
@@ -69,14 +70,6 @@ const queryDocumentsByIds = async (collectionName: string, ids: string[]) => {
     return await getDocs(q);
 };
 
-const queryDocumentsByField = async (collectionName: string, field: string, value: string | number | boolean) => {
-    const q = query(
-        collection(db, collectionName),
-        where(field, "==", value)
-    );
-    return await getDocs(q);
-};
-
 const queryAllDocuments = async (collectionName: string) => {
     const q = query(collection(db, collectionName));
     return await getDocs(q);
@@ -106,15 +99,16 @@ const extractSingleDocumentData = (querySnapshot: QuerySnapshot<DocumentData>, f
 };
 
 // Query functions for our use case using generic functions
-const getResultPath = async (jobId: string) => {
-    const querySnapshot = await queryDocumentsByField(FIRESTORE_COLLECTIONS.RESULTS, FIRESTORE_FIELDS.BATCH_JOB_ID, jobId);
-    return extractSingleDocumentData(querySnapshot, FIRESTORE_FIELDS.URL);
-};
-
-const getJobStatus = async (jobId: string) => {
+const getJobStatus = async (jobId: string): Promise<JobStatusObject|undefined> => {
     const querySnapshot = await queryDocumentById(FIRESTORE_COLLECTIONS.JOB_STATUS, jobId);
-    return extractSingleDocumentData(querySnapshot, FIRESTORE_FIELDS.STATUS);
-}
+    const docs = querySnapshot.docs.map((doc) => ({
+        status: doc.data().status,
+        error_message: doc.data().error_message,
+        outputs_directory: doc.data().outputs_directory,
+        result_path: doc.data().result_path,
+    }));
+    return docs[0] || undefined;
+};
 
 const getOutputsDirectory = async (jobId: string) => {
     const querySnapshot = await queryDocumentById(FIRESTORE_COLLECTIONS.JOB_STATUS, jobId);
@@ -166,12 +160,6 @@ const getPackingInputsDict = async (): Promise<Dictionary<PackingInputs>> => {
     return inputsDict;
 }
 
-const getDocById = async (coll: string, id: string) => {
-    const docs = await getAllDocsFromCollection(coll);
-    const doc = docs.find(d => d.id === id);
-    return JSON.stringify(doc, null, 2);
-}
-
 const getDocsByIds = async (coll: string, ids: string[]) => {
     const querySnapshot = await queryDocumentsByIds(coll, ids);
     const docs = querySnapshot.docs.map((doc) => ({
@@ -213,4 +201,4 @@ const docCleanup = async () => {
         console.log(`Cleaned up ${deletePromises.length} documents from ${collectionConfig.name}`);
     }
 }
-export { db, queryDocumentById, getDocById, getDocsByIds, getJobStatus, getResultPath, addRecipe, docCleanup, getPackingInputsDict, getOutputsDirectory };
+export { db, queryDocumentById, getDocsByIds, getJobStatus, addRecipe, docCleanup, getPackingInputsDict, getOutputsDirectory };
