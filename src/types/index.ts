@@ -23,9 +23,9 @@ export type PackingInputs = {
 
 export type JobStatusObject = {
     status: string;
-    error_message?: string;
-    outputs_directory?: string;
-    result_path?: string;
+    error_message: string;
+    outputs_directory: string;
+    result_path: string;
 };
 
 export type EditableField = {

@@ -98,11 +98,11 @@ function App() {
         }
         const range = (Date.now() - start) / 1000;
         setRunTime(range);
-        if (jobStatusObj?.status == JOB_STATUS.DONE) {
-            setResultUrl(SIMULARIUM_EMBED_URL + jobStatusObj?.result_path);
-            setOutputDir(jobStatusObj?.outputs_directory || "");
-        } else if (jobStatusObj?.status == JOB_STATUS.FAILED) {
-            setJobLogs(jobStatusObj?.error_message || "Unknown error");
+        if (jobStatusObj.status == JOB_STATUS.DONE) {
+            setResultUrl(SIMULARIUM_EMBED_URL + jobStatusObj.result_path);
+            setOutputDir(jobStatusObj.outputs_directory);
+        } else if (jobStatusObj.status == JOB_STATUS.FAILED) {
+            setJobLogs(jobStatusObj.error_message);
         }
     };
 
