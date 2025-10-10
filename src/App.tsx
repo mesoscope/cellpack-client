@@ -87,22 +87,22 @@ function App() {
 
     const checkStatus = async (jobIdFromSubmit: string) => {
         const id = jobIdFromSubmit || jobId;
-        let jobStatusObj = await getJobStatus(id);
-        while (jobStatusObj?.status !== JOB_STATUS.DONE && jobStatusObj?.status !== JOB_STATUS.FAILED) {
+        let localJobStatus = await getJobStatus(id);
+        while (localJobStatus?.status !== JOB_STATUS.DONE && localJobStatus?.status !== JOB_STATUS.FAILED) {
             await sleep(500);
-            const newJobStatusObj = await getJobStatus(id);
-            if (newJobStatusObj && jobStatusObj?.status !== newJobStatusObj.status) {
-                jobStatusObj = newJobStatusObj;
-                setJobStatus(newJobStatusObj.status);
+            const newJobStatus = await getJobStatus(id);
+            if (newJobStatus && localJobStatus?.status !== newJobStatus.status) {
+                localJobStatus = newJobStatus;
+                setJobStatus(newJobStatus.status);
             }
         }
         const range = (Date.now() - start) / 1000;
         setRunTime(range);
-        if (jobStatusObj.status == JOB_STATUS.DONE) {
-            setResultUrl(SIMULARIUM_EMBED_URL + jobStatusObj.result_path);
-            setOutputDir(jobStatusObj.outputs_directory);
-        } else if (jobStatusObj.status == JOB_STATUS.FAILED) {
-            setJobLogs(jobStatusObj.error_message);
+        if (localJobStatus.status == JOB_STATUS.DONE) {
+            setResultUrl(SIMULARIUM_EMBED_URL + localJobStatus.result_path);
+            setOutputDir(localJobStatus.outputs_directory);
+        } else if (localJobStatus.status == JOB_STATUS.FAILED) {
+            setJobLogs(localJobStatus.error_message);
         }
     };
 

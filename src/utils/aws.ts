@@ -80,6 +80,8 @@ export const downloadOutputsFromS3 = async (outputsDir: string, jobId: string) =
 
 export const downloadOutputs = async (jobId: string, outputsDir?: string) => {
     if (!outputsDir) {
+        // If uploading result files took too long, outputDir may not have been
+        // set when the job completed. Fetch it from Firestore.
         outputsDir = await getOutputsDirectory(jobId);
     }
     await downloadOutputsFromS3(outputsDir, jobId);

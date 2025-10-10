@@ -8,7 +8,7 @@ interface StatusBarProps {
     jobStatus: string;
     runTime: number;
     jobId: string;
-    outputDir?: string;
+    outputDir: string;
 } 
 
 const StatusBar = (props: StatusBarProps): JSX.Element => {
