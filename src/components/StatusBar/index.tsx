@@ -8,15 +8,16 @@ interface StatusBarProps {
     jobStatus: string;
     runTime: number;
     jobId: string;
+    outputDir: string;
 } 
 
 const StatusBar = (props: StatusBarProps): JSX.Element => {
-    const { jobStatus, runTime, jobId } = props;
+    const { jobStatus, runTime, jobId, outputDir } = props;
     const [isDownloading, setIsDownloading] = useState(false);
 
     const downloadResults = async (jobId: string) => {
         setIsDownloading(true);
-        await downloadOutputs(jobId);
+        await downloadOutputs(jobId, outputDir);
         setIsDownloading(false);
     }
 

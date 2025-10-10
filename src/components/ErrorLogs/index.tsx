@@ -4,19 +4,14 @@ import "./style.css";
 
 interface ErrorLogsProps {
     errorLogs: string;
-    getLogs: () => Promise<void>;
 }
 
 const ErrorLogs = (props: ErrorLogsProps): JSX.Element => {
-    const { errorLogs, getLogs } = props;
+    const { errorLogs } = props;
     const [viewErrorLogs, setViewErrorLogs] = useState<boolean>(true);
 
-    const toggleLogs = async () => {
-        if (errorLogs.length === 0) {
-            await getLogs();
-        } else {
-            setViewErrorLogs(!viewErrorLogs);
-        }
+    const toggleLogs = () => {
+        setViewErrorLogs(!viewErrorLogs);
     }
     const items = [{
         key: "1",
