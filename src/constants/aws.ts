@@ -5,12 +5,16 @@ const SUBMIT_PACKING_ECS = "https://bda21vau5c.execute-api.us-west-2.amazonaws.c
 const S3_BASE_URL = "https://s3.us-west-2.amazonaws.com";
 
 export const getSubmitPackingUrl = (
-    recipe: string,
+    recipe?: string,
     config?: string,
 ) => {
-    let url = `${SUBMIT_PACKING_ECS}?recipe=${recipe}`;
-    if (config) {
-        url += `&config=${config}`;
+    let url = SUBMIT_PACKING_ECS;
+    if (recipe && config) {
+        url += `?recipe=${recipe}&config=${config}`;
+    } else if (recipe) {
+        url += `?recipe=${recipe}`;
+    } else if (config) {
+        url += `?config=${config}`;
     }
     return url;
 };

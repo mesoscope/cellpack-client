@@ -8,7 +8,6 @@ import {
     documentId,
     QuerySnapshot,
     DocumentData,
-    setDoc,
     doc,
     Timestamp,
     deleteDoc,
@@ -172,10 +171,6 @@ const getDocsByIds = async (coll: string, ids: string[]) => {
     return docs;
 }
 
-const addRecipe = async (id: string, data: object) => {
-    await setDoc(doc(db, FIRESTORE_COLLECTIONS.EDITED_RECIPES, id), data);
-}
-
 const docCleanup = async () => {
     const now = Date.now();
     const collectionsToClean = [
@@ -202,4 +197,4 @@ const docCleanup = async () => {
         console.log(`Cleaned up ${deletePromises.length} documents from ${collectionConfig.name}`);
     }
 }
-export { db, queryDocumentById, getDocsByIds, getJobStatus, addRecipe, docCleanup, getPackingInputsDict, getOutputsDirectory };
+export { db, queryDocumentById, getDocsByIds, getJobStatus, docCleanup, getPackingInputsDict, getOutputsDirectory };

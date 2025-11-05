@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Layout, Typography } from "antd";
-import { getJobStatus, addRecipe } from "./utils/firebase";
+import { getJobStatus } from "./utils/firebase";
 import { getFirebaseRecipe, jsonToString } from "./utils/recipeLoader";
 import { getSubmitPackingUrl, JOB_STATUS } from "./constants/aws";
-import { FIRESTORE_FIELDS } from "./constants/firebase";
 import { SIMULARIUM_EMBED_URL } from "./constants/urls";
 import PackingInput from "./components/PackingInput";
 import Viewer from "./components/Viewer";
@@ -44,54 +42,25 @@ function App() {
         return !(jsonToString(originalRecipe) == recipeString);
     };
 
-    const recipeToFirebase = (
-        recipe: string,
-        path: string,
-        id: string
-    ): object => {
-        const recipeJson = JSON.parse(recipe);
-        if (recipeJson.bounding_box) {
-            const flattened_array = Object.assign({}, recipeJson.bounding_box);
-            recipeJson.bounding_box = flattened_array;
-        }
-        recipeJson[FIRESTORE_FIELDS.RECIPE_PATH] = path;
-        recipeJson[FIRESTORE_FIELDS.NAME] = id;
-        recipeJson[FIRESTORE_FIELDS.TIMESTAMP] = Date.now();
-        return recipeJson;
-    };
-
     const submitRecipe = async (
         recipeId: string,
         configId: string,
         recipeString: string
     ) => {
         resetState();
-        let firebaseRecipe = "firebase:recipes/" + recipeId;
-        const firebaseConfig = configId
-            ? "firebase:configs/" + configId
-            : undefined;
         const recipeChanged: boolean = await recipeHasChanged(
             recipeId,
             recipeString
         );
-        if (recipeChanged) {
-            const recipeId = uuidv4();
-            firebaseRecipe = "firebase:recipes_edited/" + recipeId;
-            const recipeJson = recipeToFirebase(
-                recipeString,
-                firebaseRecipe,
-                recipeId
-            );
-            try {
-                await addRecipe(recipeId, recipeJson);
-            } catch (e) {
-                setJobStatus(JOB_STATUS.FAILED);
-                setJobLogs(String(e));
-                return;
-            }
-        }
+        const firebaseRecipe = recipeChanged
+            ? undefined
+            : "firebase:recipes/" + recipeId;
+        const firebaseConfig = configId
+            ? "firebase:configs/" + configId
+            : undefined;
         const url = getSubmitPackingUrl(firebaseRecipe, firebaseConfig);
-        const request: RequestInfo = new Request(url, { method: "POST" });
+        const requestBody = recipeChanged ? recipeString : undefined;
+        const request = new Request(url, { method: "POST", body: requestBody });
         start = Date.now();
         const response = await fetch(request);
         setJobStatus(JOB_STATUS.SUBMITTED);
