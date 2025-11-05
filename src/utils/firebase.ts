@@ -21,11 +21,12 @@ import {
 } from "../constants/firebase";
 import {
     FirestoreDoc,
-    PackingInputs,
     Dictionary,
     EditableField,
+    RecipeManifest,
     JobStatusObject,
 } from "../types";
+import { getFirebaseRecipe } from "./recipeLoader";
 
 const getEnvVar = (key: string): string => {
     // check if we're in a browser environment (Vite)
@@ -99,7 +100,12 @@ const extractSingleDocumentData = (querySnapshot: QuerySnapshot<DocumentData>, f
 };
 
 // Query functions for our use case using generic functions
-const getJobStatus = async (jobId: string): Promise<JobStatusObject|undefined> => {
+const getResultPath = async (jobId: string) => {
+    const querySnapshot = await queryDocumentById(FIRESTORE_COLLECTIONS.RESULTS, jobId);
+    return extractSingleDocumentData(querySnapshot, FIRESTORE_FIELDS.URL);
+};
+
+const getJobStatus = async (jobId: string): Promise<JobStatusObject | undefined> => {
     const querySnapshot = await queryDocumentById(FIRESTORE_COLLECTIONS.JOB_STATUS, jobId);
     const docs = querySnapshot.docs.map((doc) => ({
         status: doc.data().status,
@@ -142,19 +148,24 @@ const getEditableFieldsList = async (editable_field_ids: string[]): Promise<Edit
     return docs;
 };
 
-const getPackingInputsDict = async (): Promise<Dictionary<PackingInputs>> => {
+const getRecipesFromFirebase = async (): Promise<Dictionary<RecipeManifest>> => {
     const docs = await getAllDocsFromCollection(FIRESTORE_COLLECTIONS.PACKING_INPUTS);
-    const inputsDict: Dictionary<PackingInputs> = {};
+    const inputsDict: Dictionary<RecipeManifest> = {};
     for (const doc of docs) {
         const name = doc[FIRESTORE_FIELDS.NAME];
         const config = doc[FIRESTORE_FIELDS.CONFIG];
-        const recipe = doc[FIRESTORE_FIELDS.RECIPE];
-        const editableFields = await getEditableFieldsList(doc[FIRESTORE_FIELDS.EDITABLE_FIELDS] || []);
-        if (name && config && recipe) {
-            inputsDict[name] = {
-                [FIRESTORE_FIELDS.CONFIG]: config,
-                [FIRESTORE_FIELDS.RECIPE]: recipe,
-                [FIRESTORE_FIELDS.EDITABLE_FIELDS]: editableFields
+        const recipeId = doc[FIRESTORE_FIELDS.RECIPE];
+
+        if (name && config && recipeId) {
+            const editableFields = await getEditableFieldsList(doc[FIRESTORE_FIELDS.EDITABLE_FIELDS] || []);
+            const recipe = await getFirebaseRecipe(recipeId);
+            inputsDict[recipeId] = {
+                recipeId: recipeId,
+                configId: config,
+                displayName: name,
+                editableFields: editableFields ?? [],
+                defaultRecipeData: recipe,
+                edits: {}
             };
         }
     }
@@ -202,4 +213,4 @@ const docCleanup = async () => {
         console.log(`Cleaned up ${deletePromises.length} documents from ${collectionConfig.name}`);
     }
 }
-export { db, queryDocumentById, getDocsByIds, getJobStatus, addRecipe, docCleanup, getPackingInputsDict, getOutputsDirectory };
+export { db, queryDocumentById, getDocsByIds, getJobStatus, getResultPath, addRecipe, docCleanup, getRecipesFromFirebase, getOutputsDirectory };

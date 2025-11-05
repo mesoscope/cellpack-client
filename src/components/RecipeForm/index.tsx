@@ -3,8 +3,8 @@ import InputSwitch from "../InputSwitch";
 import "./style.css";
 import {
     useSelectedRecipeId,
-    useFieldsToDisplay,
     useIsPacking,
+    useEditableFields,
 } from "../../state/store";
 
 interface RecipeFormProps {
@@ -13,7 +13,7 @@ interface RecipeFormProps {
 
 const RecipeForm = ({ onStartPacking }: RecipeFormProps) => {
     const recipeId = useSelectedRecipeId();
-    const fieldsToDisplay = useFieldsToDisplay();
+    const fieldsToDisplay = useEditableFields();
     const isPacking = useIsPacking();
 
     return (

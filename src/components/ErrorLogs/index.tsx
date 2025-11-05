@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Button, Drawer } from "antd";
+import { usePackingData } from "../../state/store";
+import { JOB_STATUS } from "../../constants/aws";
 import "./style.css";
 
-interface ErrorLogsProps {
-    errorLogs: string;
-}
-
-const ErrorLogs = (props: ErrorLogsProps): JSX.Element => {
-    const { errorLogs } = props;
+const ErrorLogs = (): JSX.Element => {
     const [viewErrorLogs, setViewErrorLogs] = useState<boolean>(true);
+    const {jobStatus, jobLogs: errorLogs} = usePackingData();
 
     const toggleLogs = () => {
         setViewErrorLogs(!viewErrorLogs);
+    };
+
+    if (jobStatus !== JOB_STATUS.FAILED) {
+        return <></>
     };
 
     return (

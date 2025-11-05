@@ -2,9 +2,8 @@ import { Select, Slider, InputNumber } from "antd";
 import { GradientOption } from "../../types";
 import {
     useSelectedRecipeId,
-    useUpdateRecipeObj,
+    useEditRecipe,
     useGetCurrentValue,
-    useCurrentRecipeString,
 } from "../../state/store";
 import { getSelectedGradient, deriveGradientStrength, round2, toStore } from "../../utils/gradient";
 import "./style.css";
@@ -19,10 +18,8 @@ interface GradientInputProps {
 const GradientInput = (props: GradientInputProps): JSX.Element => {
     const { displayName, description, gradientOptions, defaultValue } = props;
     const selectedRecipeId = useSelectedRecipeId();
-    const updateRecipeObj = useUpdateRecipeObj();
+    const editRecipe = useEditRecipe();
     const getCurrentValue = useGetCurrentValue();
-    // Force re-render after restore/navigation
-    useCurrentRecipeString();
 
     const { currentGradient, selectedOption } = getSelectedGradient(
         gradientOptions,
@@ -42,14 +39,14 @@ const GradientInput = (props: GradientInputProps): JSX.Element => {
         if (selectedOption.packing_mode && selectedOption.packing_mode_path) {
             changes[selectedOption.packing_mode_path] = selectedOption.packing_mode;
         }
-        updateRecipeObj(selectedRecipeId, changes);
+        editRecipe(selectedRecipeId, changes);
     };
 
     const handleStrengthChange = (val: number | null) => {
         if (val == null || !selectedRecipeId || !gradientStrengthData) return;
         const uiVal = round2(val);
         const storeVal = toStore(uiVal);
-        updateRecipeObj(selectedRecipeId, { [gradientStrengthData.path]: storeVal });
+        editRecipe(selectedRecipeId, { [gradientStrengthData.path]: storeVal });
     };
 
     const selectOptions = gradientOptions.map((option) => ({

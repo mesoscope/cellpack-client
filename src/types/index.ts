@@ -15,10 +15,22 @@ export interface Dictionary<T> {
     [Key: string]: T;
 };
 
-export type PackingInputs = {
-    config: string;
-    recipe: string;
-    editable_fields?: EditableField[];
+export interface RecipeManifest {
+    recipeId: string;
+    configId: string;
+    displayName: string;
+    editableFields: EditableField[];
+    defaultRecipeData: ViewableRecipe;
+    edits: Record<string, string | number>;
+}
+
+export interface PackingManifest {
+    jobId: string;
+    jobStatus: string;
+    jobLogs: string;
+    resultUrl: string;
+    runTime: number;
+    outputDir: string;
 };
 
 export type JobStatusObject = {

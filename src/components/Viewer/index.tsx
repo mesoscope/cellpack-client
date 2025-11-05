@@ -1,11 +1,12 @@
+import { usePackingData } from "../../state/store";
 import "./style.css";
 
-interface ViewerProps {
-    resultUrl: string;
-}
 
-const Viewer = (props: ViewerProps): JSX.Element => {
-    const { resultUrl } = props;
+const Viewer = (): JSX.Element => {
+    const { resultUrl } = usePackingData();
+    if (!resultUrl) {
+        return <></>;
+    }
     return (
         <div className="viewer-container">
             <iframe className="simularium-embed" src={resultUrl} />

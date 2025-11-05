@@ -2,20 +2,13 @@ import { useState } from "react";
 import { Button } from "antd";
 import { downloadOutputs } from "../../utils/aws";
 import { JOB_STATUS } from "../../constants/aws";
+import { usePackingData } from "../../state/store";
 import "./style.css";
 import ErrorLogs from "../ErrorLogs";
 
-interface StatusBarProps {
-    jobStatus: string;
-    runTime: number;
-    jobId: string;
-    outputDir: string;
-    errorLogs: string;
-}
-
-const StatusBar = (props: StatusBarProps): JSX.Element => {
-    const { jobStatus, runTime, jobId, errorLogs, outputDir } = props;
-
+const StatusBar = (): JSX.Element => {
+    const { jobStatus, runTime, jobId, outputDir } =
+        usePackingData();
     const [isDownloading, setIsDownloading] = useState(false);
 
     const downloadResults = async (jobId: string) => {
@@ -25,6 +18,10 @@ const StatusBar = (props: StatusBarProps): JSX.Element => {
     };
 
     const jobSucceeded = jobStatus == JOB_STATUS.DONE;
+    
+    if (!jobStatus) {
+        return <></>;
+    }
 
     return (
         <>
@@ -49,7 +46,7 @@ const StatusBar = (props: StatusBarProps): JSX.Element => {
                     Download Packing Result
                 </Button>
             )}
-            {errorLogs && <ErrorLogs errorLogs={errorLogs} />}
+            <ErrorLogs />
         </>
     );
 };

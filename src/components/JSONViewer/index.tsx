@@ -7,22 +7,20 @@ import {
     returnOneElement,
 } from "./formattingUtils";
 import "./style.css";
+import { useRecipes, useSelectedRecipeId } from "../../state/store";
+import { buildCurrentRecipeObject } from "../../state/utils";
 
-interface JSONViewerProps {
-    title: string;
-    content: string;
-    isEditable: boolean;
-    onChange: (value: string) => void;
-}
+const JSONViewer = (): JSX.Element | null => {
+    const selectedRecipeId = useSelectedRecipeId();
+    const recipes = useRecipes();
 
-const JSONViewer = (props: JSONViewerProps): JSX.Element | null => {
-    const { content } = props;
+    const currentRecipe = recipes[selectedRecipeId];
 
-    if (!content) {
+    if (!currentRecipe) {
         return null;
     }
 
-    const contentAsObj = JSON.parse(content);
+    const contentAsObj = buildCurrentRecipeObject(currentRecipe);
 
     // descriptions for top level key-value pairs
     const descriptions: DescriptionsItemProps[] = [];

@@ -3,9 +3,9 @@ import { Input, InputNumber, Select, Slider } from "antd";
 import { GradientOption } from "../../types";
 import {
     useSelectedRecipeId,
-    useUpdateRecipeObj,
+    useEditRecipe,
     useGetCurrentValue,
-    useCurrentRecipeString,
+    useRecipes,
 } from "../../state/store";
 import GradientInput from "../GradientInput";
 import "./style.css";
@@ -25,12 +25,24 @@ interface InputSwitchProps {
 }
 
 const InputSwitch = (props: InputSwitchProps): JSX.Element => {
-    const { displayName, inputType, dataType, description, min, max, options, id, gradientOptions, conversionFactor, unit } = props;
+    const {
+        displayName,
+        inputType,
+        dataType,
+        description,
+        min,
+        max,
+        options,
+        id,
+        gradientOptions,
+        conversionFactor,
+        unit
+    } = props;
 
     const selectedRecipeId = useSelectedRecipeId();
-    const updateRecipeObj = useUpdateRecipeObj();
+    const editRecipe = useEditRecipe();
     const getCurrentValue = useGetCurrentValue();
-    const recipeVersion = useCurrentRecipeString();
+    const recipeVersion = useRecipes();
 
     // Conversion factor for numeric inputs where we want to display a
     // different unit in the UI than is stored in the recipe
@@ -64,11 +76,7 @@ const InputSwitch = (props: InputSwitchProps): JSX.Element => {
     const handleInputChange = (value: string | number | null) => {
         if (value == null || !selectedRecipeId) return;
         setValue(value);
-        if (typeof value === "number") {
-            // Convert back to original units for updating recipe object
-            value = value / conversion;
-        }
-        updateRecipeObj(selectedRecipeId, { [id]: value });
+        editRecipe(selectedRecipeId, { [id]: value });
     };
 
     switch (inputType) {
