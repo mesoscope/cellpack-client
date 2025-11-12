@@ -18,7 +18,9 @@ export function ThemeRoot({ children }: { children: React.ReactNode }) {
 
     return (
         <ConfigProvider theme={isDark ? darkTheme : lightTheme}>
-            {children}
+            <div className={isDark ? "dark-theme" : "light-theme"}>
+                {children}
+            </div>
         </ConfigProvider>
     );
 }

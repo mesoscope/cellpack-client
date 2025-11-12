@@ -316,6 +316,11 @@ export const useResultUrl = () => {
     return path;
 };
 
+export const useIsModified = () => {
+    const recipe = useCurrentRecipeData();
+    return (recipe && !isEmpty(recipe.edits));
+}
+
 // Action selectors
 export const useLoadInputOptions = () =>
     useRecipeStore((s) => s.loadInputOptions);

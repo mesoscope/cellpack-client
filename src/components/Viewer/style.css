@@ -1,10 +1,38 @@
 .viewer-container {
     width: 100%;
     height: 100%;
+    position: relative;
 }
 
 .simularium-embed {
     width: 100%;
     height: 100%;
     border: 1px solid black;
+}
+
+.viewer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #DCDDE5;
+    color: #468ADE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay-content {
+    color: #468ADE;
+    font-size: 32px;
+    text-align: center;
+}
+
+.dark-theme .viewer-overlay {
+    background-color: #2C2F38;
+}
+
+.dark-theme .overlay-content {
+    color: #8b91ff;
 }
