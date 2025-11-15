@@ -5,7 +5,3 @@
     align-items: center;
     height: var(--recipe-select-height);
 }
-
-.recipe-content {
-    height: calc(100% - var(--recipe-select-height));
-}

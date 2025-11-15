@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tabs } from "antd";
 
 import {
@@ -13,8 +13,15 @@ import {
 import Dropdown from "../Dropdown";
 import JSONViewer from "../JSONViewer";
 import RecipeForm from "../RecipeForm";
-import { ExpandableText } from "../ExpandableDescription";
+import ExpandableText from "../ExpandableText";
 import "./style.css";
+import { useSiderHeight } from "../../hooks/useSiderHeight";
+import {
+    DEFAULT_DESCRIPTION_HEIGHT,
+    SELECT_HEIGHT,
+    TABS_HEADER_HEIGHT,
+    TEXT_BOTTOM_MARGIN,
+} from "../../constants";
 
 interface PackingInputProps {
     startPacking: (
@@ -34,6 +41,25 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
     const loadAllRecipes = useLoadAllRecipes();
     const selectRecipe = useSelectRecipe();
     const storeStartPacking = useStartPacking();
+    const siderHeight = useSiderHeight();
+
+    const [availableRecipeHeight, setAvailableRecipeHeight] = useState<number>(
+        siderHeight - DEFAULT_DESCRIPTION_HEIGHT - SELECT_HEIGHT - TEXT_BOTTOM_MARGIN
+    );
+    const [descriptionHeight, setDescriptionHeight] = useState<number>(
+        DEFAULT_DESCRIPTION_HEIGHT
+    );
+
+    const getAvailableHeight = useCallback(() => {
+        return (
+            siderHeight - descriptionHeight - SELECT_HEIGHT - TEXT_BOTTOM_MARGIN
+        );
+    }, [siderHeight, descriptionHeight]);
+
+    useEffect(() => {
+        const newAvailableHeight = getAvailableHeight();
+        setAvailableRecipeHeight(newAvailableHeight);
+    }, [getAvailableHeight]);
 
     const preFetchInputsAndRecipes = useCallback(async () => {
         await loadInputOptions();
@@ -73,11 +99,21 @@ const PackingInput = (props: PackingInputProps): JSX.Element => {
             ) : (
                 <>
                     {recipeObj.description && (
-                        <ExpandableText text={recipeObj.description} />
+                        <div className="recipe-description">
+                            <ExpandableText
+                                text={recipeObj.description}
+                                setCurrentHeight={setDescriptionHeight}
+                            />
+                        </div>
                     )}
                     <Tabs defaultActiveKey="1" className="recipe-content">
                         <Tabs.TabPane tab="Editable fields" key="1">
-                            <RecipeForm onStartPacking={handleStartPacking} />
+                            <RecipeForm
+                                onStartPacking={handleStartPacking}
+                                availableHeight={
+                                    availableRecipeHeight - TABS_HEADER_HEIGHT
+                                }
+                            />
                         </Tabs.TabPane>
                         <Tabs.TabPane tab="Full Recipe" key="2">
                             <JSONViewer title="Recipe" content={recipeObj} />

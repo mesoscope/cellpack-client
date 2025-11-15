@@ -2,8 +2,4 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: calc(
-        100vh - var(--header-height) - var(--recipe-select-height) -
-            var(--tab-height) - var(--footer-height) - var(--description-height)
-    );
 }

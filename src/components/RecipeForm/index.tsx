@@ -10,16 +10,17 @@ import {
 
 interface RecipeFormProps {
     onStartPacking: () => Promise<void>;
+    availableHeight: number;
 }
 
-const RecipeForm = ({ onStartPacking }: RecipeFormProps) => {
+const RecipeForm = ({ onStartPacking, availableHeight }: RecipeFormProps) => {
     const recipeId = useSelectedRecipeId();
     const fieldsToDisplay = useFieldsToDisplay();
     const isPacking = useIsPacking();
     const isOriginalRecipe = useIsOriginalRecipe();
 
     return (
-        <div className="recipe-form">
+        <div className="recipe-form" style={{ height: availableHeight }}>
             {fieldsToDisplay && (
                 <div className="input-container">
                     {fieldsToDisplay.map((field) => (
@@ -51,7 +52,7 @@ const RecipeForm = ({ onStartPacking }: RecipeFormProps) => {
                         color="primary"
                         variant="filled"
                         disabled={isPacking || isOriginalRecipe}
-                        style={{ width: "100%" }}
+                        style={{ width: "100%", minHeight: 38 }}
                     >
                         <strong>Re-run</strong>
                     </Button>

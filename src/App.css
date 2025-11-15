@@ -22,9 +22,6 @@
 }
 
 .sider {
-    height: calc(
-        100vh - var(--header-height) - var(--footer-height)
-    ); /* full height minus header and footer */
     overflow-x: hidden;
     overflow-y: auto;
     padding: 0 40px;

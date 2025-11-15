@@ -19,12 +19,14 @@ import Viewer from "./components/Viewer";
 import StatusBar from "./components/StatusBar";
 
 import "./App.css";
+import { useSiderHeight } from "./hooks/useSiderHeight";
 
 const { Header, Content, Sider, Footer } = Layout;
 const { Link } = Typography;
 
 function App() {
     const [jobStatus, setJobStatus] = useState<string>("");
+
     const setJobLogs = useSetJobLogs();
     const jobLogs = useJobLogs();
     const setJobId = useSetJobId();
@@ -32,6 +34,7 @@ function App() {
     const setPackingResults = useSetPackingResults();
     const runTime = useRunTime();
     const outputDir = useOutputsDirectory();
+    const siderHeight = useSiderHeight();
 
     let start = 0;
 
@@ -170,7 +173,12 @@ function App() {
                 </Link>
             </Header>
             <Layout>
-                <Sider width="35%" theme="light" className="sider">
+                <Sider
+                    width="35%"
+                    theme="light"
+                    className="sider"
+                    style={{ height: siderHeight }}
+                >
                     <PackingInput startPacking={startPacking} />
                 </Sider>
                 <Content className="content-container">
